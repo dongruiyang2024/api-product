@@ -105,6 +105,101 @@ export default {
       description: 'Sign up now and get free trial credits to experience seamless AI access',
       button: 'Sign Up Free'
     },
+    enterprise: {
+      nav: {
+        models: 'Model options',
+        workflow: 'Setup flow',
+        pricing: 'Pricing',
+        docs: 'Service docs',
+        keyUsage: 'Usage lookup'
+      },
+      badge: 'AI service for individuals, teams, and businesses',
+      headline: 'Let everyone freely enjoy AI services',
+      description: 'Put GPT, Claude, Gemini, and other top-tier models into one simple service, so individuals, teams, and businesses can start faster, see spending clearly, and get support when needed.',
+      primaryCta: 'Start service setup',
+      secondaryCta: 'View service details',
+      metrics: {
+        models: {
+          title: 'Top model aggregation',
+          desc: 'Access GPT, Claude, Gemini, and other leading models from one service entry point.'
+        },
+        reliability: {
+          title: 'Stable service experience',
+          desc: 'Ongoing availability, quota, and service status maintenance lowers the barrier to use.'
+        },
+        management: {
+          title: 'Transparent usage management',
+          desc: 'Spending, plans, orders, and usage records stay clear and traceable.'
+        }
+      },
+      serviceBrief: {
+        title: 'What oneAPI provides',
+        subtitle: 'For individuals, teams, and businesses, oneAPI combines model access, service assurance, and usage management into a sustainable AI service.',
+        tag: 'Product capabilities',
+        sceneLabel: 'Model access',
+        sceneValue: 'Unified access to GPT, Claude, Gemini, and other leading models',
+        modelLabel: 'Use cases',
+        modelValue: 'Creation, engineering, support, automation, and AI product integration',
+        helpLabel: 'Service assurance',
+        helpValue: 'Availability maintenance, usage records, plan management, and integration support'
+      },
+      sectionLabel: {
+        platform: 'Platform value',
+        models: 'Model coverage',
+        workflow: 'Setup flow',
+        trust: 'Long-term service'
+      },
+      capabilities: {
+        title: 'Teams care about stability, clarity, and real support',
+        unified: {
+          title: 'One service entry point',
+          desc: 'Use common models from one place instead of managing several overseas platform accounts.'
+        },
+        governance: {
+          title: 'Clear spending and usage',
+          desc: 'Top-ups, plans, orders, and usage are visible in one place so team budgets are easier to manage.'
+        },
+        reliability: {
+          title: 'Stable availability',
+          desc: 'The platform maintains model service availability to reduce disruption to your business.'
+        },
+        support: {
+          title: 'Human support',
+          desc: 'Get ongoing help from setup through everyday usage questions.'
+        }
+      },
+      models: {
+        title: 'Coverage for common team AI scenarios',
+        description: 'Useful for AI products, customer support, content work, automation flows, and engineering productivity.',
+        ready: 'Available',
+        gptName: 'GPT models',
+        claudeName: 'Claude',
+        geminiName: 'Gemini',
+        devName: 'Developer assistance',
+        openai: 'Useful for Q&A, writing, summaries, and knowledge-base product scenarios.',
+        claude: 'Useful for long documents, complex collaboration, and high-quality content work.',
+        gemini: 'Useful for multimodal understanding, content generation, and broader business scenarios.',
+        codex: 'Useful for code understanding, documentation, and automation assistance for engineering teams.'
+      },
+      flow: {
+        title: 'Prepare for launch in four steps',
+        register: { title: 'Share your needs', desc: 'Tell us your team size, scenario, and preferred models.' },
+        plan: { title: 'Confirm plan and cost', desc: 'Choose the right plan or top-up approach with clear pricing upfront.' },
+        key: { title: 'Open team account', desc: 'Prepare the account, quota, and basic settings for your team.' },
+        call: { title: 'Connect and try', desc: 'Complete trial use and checks before moving into real business usage.' }
+      },
+      trust: {
+        title: 'A team service built for ongoing operations',
+        billing: 'Spending, plans, and orders are traceable',
+        status: 'Service status and usage are visible',
+        security: 'Member login and security settings are manageable'
+      },
+      finalCta: {
+        title: 'Bring AI model services into your business more reliably',
+        description: 'Designed for AI product teams, automation teams, and businesses that need reliable access to global model capabilities.'
+      }
+    },
+
     footer: {
       allRightsReserved: 'All rights reserved.'
     }
@@ -187,8 +282,8 @@ export default {
 
   // Setup Wizard
   setup: {
-    title: 'Sub2API Setup',
-    description: 'Configure your Sub2API instance',
+    title: 'oneAPI Setup',
+    description: 'Configure your oneAPI instance',
     database: {
       title: 'Database Configuration',
       description: 'Connect to your PostgreSQL database',
@@ -5422,7 +5517,7 @@ export default {
       },
       linuxdo: {
         title: 'LinuxDo Connect Login',
-        description: 'Configure LinuxDo Connect OAuth for Sub2API end-user login',
+        description: 'Configure LinuxDo Connect OAuth for oneAPI end-user login',
         enable: 'Enable LinuxDo Login',
         enableHint: 'Show LinuxDo login on the login/register pages',
         clientId: 'Client ID',
@@ -5442,7 +5537,7 @@ export default {
       },
       dingtalk: {
         title: 'DingTalk Login',
-        description: 'Configure DingTalk OAuth for Sub2API end-user login',
+        description: 'Configure DingTalk OAuth for oneAPI end-user login',
         enable: 'Enable DingTalk Login (Internal Corporate App)',
         enableHint: 'Show DingTalk login on the login/register pages',
         clientId: 'Client ID (AppKey)',
@@ -5642,7 +5737,7 @@ export default {
         backendModeDescription:
           'Disables user registration, public site, and self-service features. Only admin can log in and manage the platform.',
         siteName: 'Site Name',
-        siteNamePlaceholder: 'Sub2API',
+        siteNamePlaceholder: 'oneAPI',
         siteNameHint: 'Displayed in emails and page titles',
         siteSubtitle: 'Site Subtitle',
         siteSubtitlePlaceholder: 'Subscription to API Conversion Platform',
@@ -5932,7 +6027,7 @@ export default {
         fromEmail: 'From Email',
         fromEmailPlaceholder: "noreply{'@'}example.com",
         fromName: 'From Name',
-        fromNamePlaceholder: 'Sub2API',
+        fromNamePlaceholder: 'oneAPI',
         useTls: 'Use TLS',
         useTlsHint: 'Enable TLS encryption for SMTP connection'
       },
@@ -6573,14 +6668,14 @@ export default {
     // Admin tour steps
     admin: {
       welcome: {
-        title: '👋 Welcome to Sub2API',
-        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Sub2API is a powerful AI service gateway platform that helps you easily manage and distribute AI services.</p><p style="margin-bottom: 12px;"><b>🎯 Core Features:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>Group Management</b> - Create service tiers (VIP, Free Trial, etc.)</li><li>🔗 <b>Account Pool</b> - Connect multiple upstream AI service accounts</li><li>🔑 <b>Key Distribution</b> - Generate independent API Keys for users</li><li>💰 <b>Billing Control</b> - Flexible rate and quota management</li></ul><p style="color: #10b981; font-weight: 600;">Let\'s complete the initial setup in 3 minutes →</p></div>',
+        title: '👋 Welcome to oneAPI',
+        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">oneAPI is a powerful AI service gateway platform that helps you easily manage and distribute AI services.</p><p style="margin-bottom: 12px;"><b>🎯 Core Features:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>Group Management</b> - Create service tiers (VIP, Free Trial, etc.)</li><li>🔗 <b>Account Pool</b> - Connect multiple upstream AI service accounts</li><li>🔑 <b>Key Distribution</b> - Generate independent API Keys for users</li><li>💰 <b>Billing Control</b> - Flexible rate and quota management</li></ul><p style="color: #10b981; font-weight: 600;">Let\'s complete the initial setup in 3 minutes →</p></div>',
         nextBtn: 'Start Setup 🚀',
         prevBtn: 'Skip'
       },
       groupManage: {
         title: '📦 Step 1: Group Management',
-        description: '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>What is a Group?</b></p><p style="margin-bottom: 12px;">Groups are the core concept of Sub2API, like a "service package":</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 Each group can contain multiple upstream accounts</li><li>💰 Each group has independent billing multiplier</li><li>👥 Can be set as public or exclusive</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 Example:</b> You can create "VIP Premium" (high rate) and "Free Trial" (low rate) groups</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 Click "Group Management" on the left sidebar</p></div>'
+        description: '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>What is a Group?</b></p><p style="margin-bottom: 12px;">Groups are the core concept of oneAPI, like a "service package":</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 Each group can contain multiple upstream accounts</li><li>💰 Each group has independent billing multiplier</li><li>👥 Can be set as public or exclusive</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 Example:</b> You can create "VIP Premium" (high rate) and "Free Trial" (low rate) groups</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 Click "Group Management" on the left sidebar</p></div>'
       },
       createGroup: {
         title: '➕ Create New Group',
@@ -6673,8 +6768,8 @@ export default {
     // User tour steps
     user: {
       welcome: {
-        title: '👋 Welcome to Sub2API',
-        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Hello! Welcome to the Sub2API AI service platform.</p><p style="margin-bottom: 12px;"><b>🎯 Quick Start:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 Create API Key</li><li>📋 Copy key to your application</li><li>🚀 Start using AI services</li></ul><p style="color: #10b981; font-weight: 600;">Just 1 minute, let\'s get started →</p></div>',
+        title: '👋 Welcome to oneAPI',
+        description: '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Hello! Welcome to the oneAPI AI service platform.</p><p style="margin-bottom: 12px;"><b>🎯 Quick Start:</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 Create API Key</li><li>📋 Copy key to your application</li><li>🚀 Start using AI services</li></ul><p style="color: #10b981; font-weight: 600;">Just 1 minute, let\'s get started →</p></div>',
         nextBtn: 'Start 🚀',
         prevBtn: 'Skip'
       },

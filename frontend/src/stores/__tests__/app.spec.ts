@@ -251,6 +251,15 @@ describe('useAppStore', () => {
 
   // --- 公开设置 ---
 
+  describe('品牌默认值', () => {
+    it('默认站点名为 oneAPI', () => {
+      const store = useAppStore()
+
+      expect(store.siteName).toBe('oneAPI')
+    })
+  })
+
+
   describe('公开设置加载', () => {
     it('从 window.__APP_CONFIG__ 初始化', () => {
       const windowAny = window as any

@@ -1,0 +1,33 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512" role="img" aria-label="oneAPI logo">
+  <defs>
+    <linearGradient id="blue" x1="88" y1="96" x2="430" y2="420" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#006CFF"/>
+      <stop offset="0.52" stop-color="#0051F5"/>
+      <stop offset="1" stop-color="#064FE3"/>
+    </linearGradient>
+    <linearGradient id="cyan" x1="188" y1="186" x2="345" y2="330" gradientUnits="userSpaceOnUse">
+      <stop offset="0" stop-color="#27F7FF"/>
+      <stop offset="1" stop-color="#10D9E7"/>
+    </linearGradient>
+  </defs>
+  <g fill="none" stroke-linecap="round" stroke-linejoin="round">
+    <path d="M181 223c82 0 78-93 154-93h28" stroke="url(#blue)" stroke-width="36"/>
+    <path d="M181 289c82 0 78 93 154 93h28" stroke="url(#blue)" stroke-width="36"/>
+    <path d="M181 256h185" stroke="url(#blue)" stroke-width="36"/>
+    <path d="M207 224c45-4 73-21 102-56" stroke="url(#cyan)" stroke-width="11"/>
+    <path d="M207 288c45 4 73 21 102 56" stroke="url(#cyan)" stroke-width="11"/>
+    <path d="M217 256h97" stroke="url(#cyan)" stroke-width="11"/>
+    <circle cx="146" cy="256" r="58" stroke="url(#blue)" stroke-width="45"/>
+  </g>
+  <g>
+    <circle cx="390" cy="130" r="47" fill="url(#blue)"/>
+    <circle cx="390" cy="130" r="28" fill="#fff"/>
+    <circle cx="390" cy="130" r="15" fill="#17DCE8"/>
+    <circle cx="390" cy="256" r="47" fill="url(#blue)"/>
+    <circle cx="390" cy="256" r="28" fill="#fff"/>
+    <circle cx="390" cy="256" r="15" fill="#17DCE8"/>
+    <circle cx="390" cy="382" r="47" fill="url(#blue)"/>
+    <circle cx="390" cy="382" r="28" fill="#fff"/>
+    <circle cx="390" cy="382" r="15" fill="#17DCE8"/>
+  </g>
+</svg>

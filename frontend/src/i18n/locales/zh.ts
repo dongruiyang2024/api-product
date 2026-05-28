@@ -105,6 +105,101 @@ export default {
       description: '注册即可获得免费试用额度，体验一站式 AI 服务',
       button: '免费注册'
     },
+    enterprise: {
+      nav: {
+        models: '模型能力',
+        workflow: '开通流程',
+        pricing: '套餐价格',
+        docs: '服务文档',
+        keyUsage: '用量查询'
+      },
+      badge: '面向每个人、团队和企业的 AI 服务',
+      headline: '让每个人都可以自由地享受 AI 服务',
+      description: '把 GPT、Claude、Gemini 等顶级模型统一放到一个简单服务里，无论个人、团队还是企业，都可以更快开通、更清楚地查看费用，并在使用过程中获得支持。',
+      primaryCta: '立即开通服务',
+      secondaryCta: '查看服务介绍',
+      metrics: {
+        models: {
+          title: '顶级模型聚合',
+          desc: '覆盖 GPT、Claude、Gemini 等能力，一个服务入口即可使用。'
+        },
+        reliability: {
+          title: '稳定服务体验',
+          desc: '持续维护可用性、额度与服务状态，降低使用门槛。'
+        },
+        management: {
+          title: '透明用量管理',
+          desc: '费用、套餐、订单和使用情况清晰可查。'
+        }
+      },
+      serviceBrief: {
+        title: 'oneAPI 能提供什么',
+        subtitle: '面向个人、团队和企业，把模型能力、服务保障和使用管理整合为可持续使用的 AI 服务。',
+        tag: '产品能力',
+        sceneLabel: '模型能力',
+        sceneValue: 'GPT、Claude、Gemini 等顶级模型统一使用',
+        modelLabel: '使用场景',
+        modelValue: '创作、研发、客服、自动化和 AI 产品接入',
+        helpLabel: '服务保障',
+        helpValue: '稳定性维护、用量记录、套餐管理和接入支持'
+      },
+      sectionLabel: {
+        platform: '平台能力',
+        models: '模型覆盖',
+        workflow: '开通流程',
+        trust: '长期服务'
+      },
+      capabilities: {
+        title: '团队真正关心的是稳定、好管、有人支持',
+        unified: {
+          title: '统一服务入口',
+          desc: '不用分别处理多个海外平台账号，团队从一个入口使用常用模型。'
+        },
+        governance: {
+          title: '费用和用量清楚',
+          desc: '充值、套餐、订单和使用情况集中查看，团队预算更容易管理。'
+        },
+        reliability: {
+          title: '稳定可用',
+          desc: '平台持续维护模型服务可用性，减少业务中断带来的影响。'
+        },
+        support: {
+          title: '有人支持',
+          desc: '从开通到日常使用问题，都可以获得持续协助。'
+        }
+      },
+      models: {
+        title: '覆盖团队常用 AI 模型场景',
+        description: '适合 AI 产品、客服、内容生产、自动化流程和研发效率提升等场景。',
+        ready: '可用',
+        gptName: 'GPT 系列',
+        claudeName: 'Claude',
+        geminiName: 'Gemini',
+        devName: '开发辅助',
+        openai: '适合问答、写作、总结和知识库等常见产品场景。',
+        claude: '适合长文档理解、复杂任务协作和高质量内容处理。',
+        gemini: '适合多模态理解、内容生成和更丰富的业务场景。',
+        codex: '适合研发团队做代码理解、文档整理和自动化辅助。'
+      },
+      flow: {
+        title: '四步完成上线前准备',
+        register: { title: '提交需求', desc: '说明团队规模、使用场景和希望优先使用的模型。' },
+        plan: { title: '确认方案和费用', desc: '根据使用方式选择合适套餐或充值方式，费用提前说明。' },
+        key: { title: '开通团队账号', desc: '为团队准备账号、额度和基础设置。' },
+        call: { title: '接入并试用', desc: '完成试用和检查后，再逐步放到真实业务中使用。' }
+      },
+      trust: {
+        title: '适合长期运营的团队服务',
+        billing: '费用、套餐和订单可追踪',
+        status: '服务状态和使用情况可查看',
+        security: '成员登录和安全设置可管理'
+      },
+      finalCta: {
+        title: '让 AI 模型服务更稳定地进入你的业务',
+        description: '适合 AI 产品团队、自动化团队，以及需要稳定使用全球模型能力的企业客户。'
+      }
+    },
+
     footer: {
       allRightsReserved: '保留所有权利。'
     }
@@ -187,8 +282,8 @@ export default {
 
   // Setup Wizard
   setup: {
-    title: 'Sub2API 安装向导',
-    description: '配置您的 Sub2API 实例',
+    title: 'oneAPI 安装向导',
+    description: '配置您的 oneAPI 实例',
     database: {
       title: '数据库配置',
       description: '连接到您的 PostgreSQL 数据库',
@@ -5584,7 +5679,7 @@ export default {
       },
       linuxdo: {
         title: 'LinuxDo Connect 登录',
-        description: '配置 LinuxDo Connect OAuth，用于 Sub2API 用户登录',
+        description: '配置 LinuxDo Connect OAuth，用于 oneAPI 用户登录',
         enable: '启用 LinuxDo 登录',
         enableHint: '在登录/注册页面显示 LinuxDo 登录入口',
         clientId: 'Client ID',
@@ -5603,7 +5698,7 @@ export default {
       },
       dingtalk: {
         title: '钉钉登录',
-        description: '配置钉钉 OAuth，用于 Sub2API 用户登录',
+        description: '配置钉钉 OAuth，用于 oneAPI 用户登录',
         enable: '启用钉钉登录-企业内部应用',
         enableHint: '在登录/注册页面显示钉钉登录入口',
         clientId: 'Client ID（AppKey）',
@@ -5799,7 +5894,7 @@ export default {
           '禁用用户注册、公开页面和自助服务功能。仅管理员可以登录和管理平台。',
         siteName: '站点名称',
         siteNameHint: '显示在邮件和页面标题中',
-        siteNamePlaceholder: 'Sub2API',
+        siteNamePlaceholder: 'oneAPI',
         siteSubtitle: '站点副标题',
         siteSubtitleHint: '显示在登录和注册页面',
         siteSubtitlePlaceholder: '订阅转 API 转换平台',
@@ -6090,7 +6185,7 @@ export default {
         fromEmail: '发件人邮箱',
         fromEmailPlaceholder: "noreply{'@'}example.com",
         fromName: '发件人名称',
-        fromNamePlaceholder: 'Sub2API',
+        fromNamePlaceholder: 'oneAPI',
         useTls: '使用 TLS',
         useTlsHint: '为 SMTP 连接启用 TLS 加密'
       },
@@ -6728,16 +6823,16 @@ export default {
     // Admin tour steps
     admin: {
       welcome: {
-        title: '👋 欢迎使用 Sub2API',
+        title: '👋 欢迎使用 oneAPI',
         description:
-          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">Sub2API 是一个强大的 AI 服务中转平台，让您轻松管理和分发 AI 服务。</p><p style="margin-bottom: 12px;"><b>🎯 核心功能：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>分组管理</b> - 创建不同的服务套餐（VIP、免费试用等）</li><li>🔗 <b>账号池</b> - 连接多个上游 AI 服务商账号</li><li>🔑 <b>密钥分发</b> - 为用户生成独立的 API Key</li><li>💰 <b>计费管理</b> - 灵活的费率和配额控制</li></ul><p style="color: #10b981; font-weight: 600;">接下来，我们将用 3 分钟带您完成首次配置 →</p></div>',
+          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">oneAPI 是一个强大的 AI 服务中转平台，让您轻松管理和分发 AI 服务。</p><p style="margin-bottom: 12px;"><b>🎯 核心功能：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>📦 <b>分组管理</b> - 创建不同的服务套餐（VIP、免费试用等）</li><li>🔗 <b>账号池</b> - 连接多个上游 AI 服务商账号</li><li>🔑 <b>密钥分发</b> - 为用户生成独立的 API Key</li><li>💰 <b>计费管理</b> - 灵活的费率和配额控制</li></ul><p style="color: #10b981; font-weight: 600;">接下来，我们将用 3 分钟带您完成首次配置 →</p></div>',
         nextBtn: '开始配置 🚀',
         prevBtn: '跳过'
       },
       groupManage: {
         title: '📦 第一步：分组管理',
         description:
-          '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>什么是分组？</b></p><p style="margin-bottom: 12px;">分组是 Sub2API 的核心概念，它就像一个"服务套餐"：</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 每个分组可以包含多个上游账号</li><li>💰 每个分组有独立的计费倍率</li><li>👥 可以设置为公开或专属分组</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 示例：</b>您可以创建"VIP专线"（高倍率）和"免费试用"（低倍率）两个分组</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 点击左侧的"分组管理"开始</p></div>'
+          '<div style="line-height: 1.7;"><p style="margin-bottom: 12px;"><b>什么是分组？</b></p><p style="margin-bottom: 12px;">分组是 oneAPI 的核心概念，它就像一个"服务套餐"：</p><ul style="margin-left: 20px; margin-bottom: 12px; font-size: 13px;"><li>🎯 每个分组可以包含多个上游账号</li><li>💰 每个分组有独立的计费倍率</li><li>👥 可以设置为公开或专属分组</li></ul><p style="margin-top: 12px; padding: 8px 12px; background: #f0fdf4; border-left: 3px solid #10b981; border-radius: 4px; font-size: 13px;"><b>💡 示例：</b>您可以创建"VIP专线"（高倍率）和"免费试用"（低倍率）两个分组</p><p style="margin-top: 16px; color: #10b981; font-weight: 600;">👉 点击左侧的"分组管理"开始</p></div>'
       },
       createGroup: {
         title: '➕ 创建新分组',
@@ -6849,9 +6944,9 @@ export default {
     // User tour steps
     user: {
       welcome: {
-        title: '👋 欢迎使用 Sub2API',
+        title: '👋 欢迎使用 oneAPI',
         description:
-          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">您好！欢迎来到 Sub2API AI 服务平台。</p><p style="margin-bottom: 12px;"><b>🎯 快速开始：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 创建 API 密钥</li><li>📋 复制密钥到您的应用</li><li>🚀 开始使用 AI 服务</li></ul><p style="color: #10b981; font-weight: 600;">只需 1 分钟，让我们开始吧 →</p></div>',
+          '<div style="line-height: 1.8;"><p style="margin-bottom: 16px;">您好！欢迎来到 oneAPI AI 服务平台。</p><p style="margin-bottom: 12px;"><b>🎯 快速开始：</b></p><ul style="margin-left: 20px; margin-bottom: 16px;"><li>🔑 创建 API 密钥</li><li>📋 复制密钥到您的应用</li><li>🚀 开始使用 AI 服务</li></ul><p style="color: #10b981; font-weight: 600;">只需 1 分钟，让我们开始吧 →</p></div>',
         nextBtn: '开始 🚀',
         prevBtn: '跳过'
       },
