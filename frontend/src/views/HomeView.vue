@@ -77,11 +77,20 @@
             </p>
             <div class="mt-8 flex flex-col gap-3 sm:flex-row">
               <router-link
-                :to="isAuthenticated ? dashboardPath : '/register'"
+                v-if="isAuthenticated"
+                :to="dashboardPath"
                 class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
               >
                 {{ t('home.enterprise.primaryCta') }}
               </router-link>
+              <button
+                v-else
+                type="button"
+                class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+                @click="openLoginModal"
+              >
+                {{ t('home.enterprise.primaryCta') }}
+              </button>
               <a
                 :href="docUrl || '#integration'"
                 :target="docUrl ? '_blank' : undefined"
@@ -194,9 +203,21 @@
               <p class="mt-3 max-w-3xl text-sm leading-6 text-slate-600">{{ t('home.enterprise.finalCta.description') }}</p>
             </div>
             <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
-              <router-link :to="isAuthenticated ? dashboardPath : '/register'" class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700">
+              <router-link
+                v-if="isAuthenticated"
+                :to="dashboardPath"
+                class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+              >
                 {{ t('home.enterprise.primaryCta') }}
               </router-link>
+              <button
+                v-else
+                type="button"
+                class="inline-flex items-center justify-center rounded-lg bg-sky-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition-colors hover:bg-sky-700"
+                @click="openLoginModal"
+              >
+                {{ t('home.enterprise.primaryCta') }}
+              </button>
               <router-link to="/purchase" class="inline-flex items-center justify-center rounded-lg border border-sky-200 bg-white px-5 py-3 text-sm font-semibold text-sky-700 transition-colors hover:bg-sky-50">
                 {{ t('home.enterprise.nav.pricing') }}
               </router-link>

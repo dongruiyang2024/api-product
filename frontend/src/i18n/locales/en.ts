@@ -499,6 +499,7 @@ export default {
     continue: 'Continue',
     rememberMe: 'Remember me',
     dontHaveAccount: "Don't have an account?",
+    accountOpeningContact: 'To open an account, add WeChat: {wechat}.',
     alreadyHaveAccount: 'Already have an account?',
     registrationDisabled: 'Registration is currently disabled. Please contact the administrator.',
     emailLabel: 'Email',

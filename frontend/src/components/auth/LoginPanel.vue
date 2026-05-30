@@ -176,14 +176,8 @@
       </div>
     </form>
 
-    <p v-if="showRegisterLink && !backendModeEnabled" class="text-center text-sm text-gray-500 dark:text-dark-400">
-      {{ t('auth.dontHaveAccount') }}
-      <router-link
-        to="/register"
-        class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
-      >
-        {{ t('auth.signUp') }}
-      </router-link>
+    <p v-if="showAccountContact && !backendModeEnabled" class="text-center text-sm leading-6 text-gray-500 dark:text-dark-400">
+      {{ t('auth.accountOpeningContact', { wechat: accountContactWechat }) }}
     </p>
   </div>
 
@@ -219,11 +213,11 @@ import { clearAllAffiliateReferralCodes } from '@/utils/oauthAffiliate'
 
 const props = withDefaults(defineProps<{
   redirectTo?: string
-  showRegisterLink?: boolean
+  showAccountContact?: boolean
   autofocus?: boolean
 }>(), {
   redirectTo: '',
-  showRegisterLink: true,
+  showAccountContact: true,
   autofocus: true
 })
 
@@ -233,6 +227,7 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const LOGIN_AGREEMENT_STORAGE_KEY = 'sub2api_login_agreement_consent'
+const accountContactWechat = 'brysjhhrhl6'
 
 // ==================== Router & Stores ====================
 
