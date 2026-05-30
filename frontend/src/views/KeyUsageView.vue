@@ -1,13 +1,13 @@
 <template>
-  <div class="relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950">
+  <div class="relative flex min-h-screen flex-col bg-[#f8fbff] text-slate-950 dark:bg-dark-950 dark:text-gray-100">
     <!-- Header (same pattern as HomeView) -->
     <header class="relative z-20 px-6 py-4">
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
-          <div class="h-10 w-10 overflow-hidden rounded-xl shadow-md">
+          <div class="h-10 w-10 overflow-hidden">
             <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
           </div>
-          <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">{{ siteName }}</span>
+          <span class="text-lg font-semibold tracking-tight text-slate-950 dark:text-white">{{ siteName }}</span>
         </router-link>
         <div class="flex items-center gap-3">
           <LocaleSwitcher />
@@ -58,7 +58,7 @@
               v-model="apiKey"
               :type="keyVisible ? 'text' : 'password'"
               :placeholder="t('keyUsage.placeholder')"
-              class="input-ring w-full h-12 pl-12 pr-12 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-dark-900 dark:text-white dark:placeholder:text-dark-500"
+              class="input-ring h-12 w-full rounded-lg border border-sky-100 bg-white pl-12 pr-12 text-sm text-slate-950 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-dark-900 dark:text-white dark:placeholder:text-dark-500"
               @keydown.enter="queryKey"
             />
             <button
@@ -77,7 +77,7 @@
           <button
             @click="queryKey"
             :disabled="isQuerying"
-            class="h-12 px-7 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm transition-all active:scale-[0.97] flex items-center gap-2 whitespace-nowrap disabled:opacity-60"
+            class="flex h-12 items-center gap-2 whitespace-nowrap rounded-lg bg-primary-600 px-7 text-sm font-medium text-white transition-all hover:bg-primary-700 active:scale-[0.97] disabled:opacity-60"
           >
             <svg v-if="isQuerying" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
@@ -525,7 +525,7 @@ function setDailyUsageDays(days: 7 | 30 | 90) {
 
 const CIRCUMFERENCE = 2 * Math.PI * 68
 const RING_GRADIENTS = [
-  { from: '#14b8a6', to: '#5eead4' },
+  { from: '#0284c7', to: '#7dd3fc' },
   { from: '#6366F1', to: '#A5B4FC' },
   { from: '#10B981', to: '#6EE7B7' },
   { from: '#F59E0B', to: '#FCD34D' },
@@ -943,8 +943,8 @@ onUnmounted(() => {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .input-ring:focus {
-  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
-  border-color: #14b8a6;
+  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
+  border-color: #0284c7;
   outline: none;
 }
 

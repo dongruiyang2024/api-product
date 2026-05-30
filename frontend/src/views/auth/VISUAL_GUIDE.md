@@ -11,8 +11,8 @@ Both LoginView and RegisterView use the AuthLayout component, which provides:
 │                                             │
 │  ┌─────────────────────────────────────┐   │
 │  │                                     │   │
-│  │         Sub2API Logo                │   │
-│  │  "Subscription to API Conversion"   │   │
+│  │         Site Logo                   │   │
+│  │  "Unified AI Model Service"         │   │
 │  │                                     │   │
 │  └─────────────────────────────────────┘   │
 │                                             │
@@ -26,8 +26,8 @@ Both LoginView and RegisterView use the AuthLayout component, which provides:
 │                                             │
 └─────────────────────────────────────────────┘
 
-Background: Gradient (Indigo → White → Purple)
-Card: White with rounded corners and shadow
+Background: Soft sky-tinted surface
+Card: White with 8px radius and shadow
 Max Width: 28rem (448px)
 Centered: Both horizontally and vertically
 ```
@@ -39,8 +39,8 @@ Centered: Both horizontally and vertically
 ```
 ┌─────────────────────────────────────────────┐
 │                                             │
-│         🔷 Sub2API                          │
-│    Subscription to API Conversion Platform  │
+│         🔷 oneAPI                           │
+│    Unified AI Model Service Platform        │
 │                                             │
 │  ┌─────────────────────────────────────┐   │
 │  │                                     │   │
@@ -133,13 +133,13 @@ Centered: Both horizontally and vertically
 ```
 ┌─────────────────────────────────────────────┐
 │                                             │
-│         🔷 Sub2API                          │
-│    Subscription to API Conversion Platform  │
+│         🔷 oneAPI                           │
+│    Unified AI Model Service Platform        │
 │                                             │
 │  ┌─────────────────────────────────────┐   │
 │  │                                     │   │
 │  │        Create Account               │   │
-│  │     Sign up to start using Sub2API  │   │
+│  │ Sign up to start using the platform │   │
 │  │                                     │   │
 │  │  Username                           │   │
 │  │  ┌────────────────────────────────┐ │   │

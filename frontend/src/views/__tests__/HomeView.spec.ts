@@ -30,8 +30,8 @@ const messages: Record<string, string> = {
   'home.enterprise.metrics.reliability.desc': '持续维护可用性、额度与服务状态，降低使用门槛。',
   'home.enterprise.metrics.management.title': '透明用量管理',
   'home.enterprise.metrics.management.desc': '费用、套餐、订单和使用情况清晰可查。',
-  'home.enterprise.serviceBrief.title': 'oneAPI 能提供什么',
-  'home.enterprise.serviceBrief.subtitle': '面向个人、团队和企业，把模型能力、服务保障和使用管理整合为可持续使用的 AI 服务。',
+  'home.enterprise.serviceBrief.title': '平台能提供什么',
+  'home.enterprise.serviceBrief.subtitle': '面向个人、团队和企业，把模型能力、服务保障和使用管理整合为可持续使用的 AI 模型服务。',
   'home.enterprise.serviceBrief.tag': '产品能力',
   'home.enterprise.serviceBrief.sceneLabel': '模型能力',
   'home.enterprise.serviceBrief.sceneValue': 'GPT、Claude、Gemini 等顶级模型统一使用',
@@ -159,7 +159,7 @@ describe('HomeView enterprise landing page', () => {
     expect(text).toContain('顶级模型聚合')
     expect(text).toContain('稳定服务体验')
     expect(text).toContain('透明用量管理')
-    expect(text).toContain('oneAPI 能提供什么')
+    expect(text).toContain('平台能提供什么')
     expect(text).toContain('模型能力')
     expect(text).toContain('使用场景')
     expect(text).toContain('服务保障')

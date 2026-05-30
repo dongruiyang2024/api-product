@@ -12,12 +12,12 @@
   <div v-else class="min-h-screen bg-[#f8fbff] text-stone-950">
     <header class="sticky top-0 z-30 border-b border-stone-200/80 bg-[#f8fbff]/95 px-5 py-3 backdrop-blur">
       <nav class="mx-auto flex max-w-7xl items-center justify-between gap-4">
-        <router-link to="/home" class="flex min-w-0 items-center gap-3" aria-label="oneAPI home">
+        <router-link to="/home" class="flex min-w-0 items-center gap-3" :aria-label="`${siteName} home`">
           <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden">
             <img
               data-testid="oneapi-logo"
               :src="siteLogo || '/logo.svg'"
-              alt="oneAPI Logo"
+              :alt="`${siteName} Logo`"
               class="h-full w-full object-contain"
             />
           </span>
