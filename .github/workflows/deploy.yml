@@ -51,22 +51,61 @@ jobs:
 
       - name: Prepare SSH
         env:
-          SSH_PORT: ${{ secrets.ALIYUN_PORT || '22' }}
+          ALIYUN_DEPLOY_BUNDLE: ${{ secrets.ALIYUN_DEPLOY_KEY }}
         run: |
+          set -euo pipefail
+
+          bundle_file="$RUNNER_TEMP/aliyun-deploy.env"
+          printf '%s\n' "$ALIYUN_DEPLOY_BUNDLE" > "$bundle_file"
+
+          get_config() {
+            key="$1"
+            default="${2:-}"
+            value="$(sed -n "s/^${key}=//p" "$bundle_file" | head -n 1)"
+            if [ -z "$value" ]; then
+              value="$default"
+            fi
+            printf '%s' "$value"
+          }
+
+          ALIYUN_HOST="$(get_config ALIYUN_HOST)"
+          ALIYUN_USER="$(get_config ALIYUN_USER root)"
+          ALIYUN_PORT="$(get_config ALIYUN_PORT 22)"
+          ALIYUN_DEPLOY_PATH="$(get_config ALIYUN_DEPLOY_PATH /root/service/sub2api)"
+
+          if [ -z "$ALIYUN_HOST" ]; then
+            echo "::error::ALIYUN_DEPLOY_KEY must include ALIYUN_HOST=your_server_ip"
+            exit 1
+          fi
+
           mkdir -p ~/.ssh
-          printf '%s\n' "${{ secrets.ALIYUN_DEPLOY_KEY }}" > ~/.ssh/aliyun_deploy
+          sed -n '/^ALIYUN_DEPLOY_KEY=/,$p' "$bundle_file" \
+            | sed '1s/^ALIYUN_DEPLOY_KEY=//' \
+            | sed "1s/^'//; \$s/'$//" \
+            > ~/.ssh/aliyun_deploy
           chmod 600 ~/.ssh/aliyun_deploy
-          ssh-keyscan -p "$SSH_PORT" "${{ secrets.ALIYUN_HOST }}" >> ~/.ssh/known_hosts
+
+          if ! grep -q -- '-----BEGIN OPENSSH PRIVATE KEY-----' ~/.ssh/aliyun_deploy; then
+            echo "::error::ALIYUN_DEPLOY_KEY must include a full OPENSSH private key after ALIYUN_DEPLOY_KEY="
+            exit 1
+          fi
+
+          {
+            echo "ALIYUN_HOST=$ALIYUN_HOST"
+            echo "ALIYUN_USER=$ALIYUN_USER"
+            echo "ALIYUN_PORT=$ALIYUN_PORT"
+            echo "ALIYUN_DEPLOY_PATH=$ALIYUN_DEPLOY_PATH"
+          } >> "$GITHUB_ENV"
+
+          ssh-keyscan -p "$ALIYUN_PORT" "$ALIYUN_HOST" >> ~/.ssh/known_hosts
 
       - name: Deploy on Aliyun
         env:
-          SSH_PORT: ${{ secrets.ALIYUN_PORT || '22' }}
-          DEPLOY_PATH: ${{ secrets.ALIYUN_DEPLOY_PATH || '/root/service/sub2api' }}
           GHCR_USER: ${{ github.repository_owner }}
           GHCR_TOKEN: ${{ github.token }}
         run: |
-          ssh -i ~/.ssh/aliyun_deploy -p "$SSH_PORT" "${{ secrets.ALIYUN_USER }}@${{ secrets.ALIYUN_HOST }}" \
-            "GHCR_USER='$GHCR_USER' GHCR_TOKEN='$GHCR_TOKEN' DEPLOY_PATH='$DEPLOY_PATH' bash -se" <<'EOF'
+          ssh -i ~/.ssh/aliyun_deploy -p "$ALIYUN_PORT" "$ALIYUN_USER@$ALIYUN_HOST" \
+            "GHCR_USER='$GHCR_USER' GHCR_TOKEN='$GHCR_TOKEN' DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' bash -se" <<'EOF'
           set -euo pipefail
 
           cd "$DEPLOY_PATH"
