@@ -407,7 +407,6 @@ watch(isAuthenticated, (authenticated) => {
 })
 
 onMounted(() => {
-  authStore.checkAuth()
   if (!appStore.publicSettingsLoaded) {
     appStore.fetchPublicSettings()
   }

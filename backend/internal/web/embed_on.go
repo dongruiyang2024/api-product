@@ -22,6 +22,7 @@ import (
 const (
 	// NonceHTMLPlaceholder is the placeholder for nonce in HTML script tags
 	NonceHTMLPlaceholder = "__CSP_NONCE_VALUE__"
+	staticCacheControl   = "public, max-age=31536000, immutable"
 )
 
 //go:embed all:dist
@@ -109,6 +110,7 @@ func (s *FrontendServer) Middleware() gin.HandlerFunc {
 		}
 
 		// Serve static files normally
+		setStaticCacheHeaders(c, cleanPath)
 		s.fileServer.ServeHTTP(c.Writer, c.Request)
 		c.Abort()
 	}
@@ -272,6 +274,7 @@ func ServeEmbeddedFrontend() gin.HandlerFunc {
 			if tryServeOverrideFile(c, overrideDir, cleanPath) {
 				return
 			}
+			setStaticCacheHeaders(c, cleanPath)
 			fileServer.ServeHTTP(c.Writer, c.Request)
 			c.Abort()
 			return
@@ -294,6 +297,20 @@ func tryServeOverrideFile(c *gin.Context, overrideDir, cleanPath string) bool {
 	c.File(filePath)
 	c.Abort()
 	return true
+}
+
+func setStaticCacheHeaders(c *gin.Context, cleanPath string) {
+	if isLongLivedStaticAsset(cleanPath) {
+		c.Header("Cache-Control", staticCacheControl)
+	}
+}
+
+func isLongLivedStaticAsset(cleanPath string) bool {
+	path := strings.TrimPrefix(filepath.ToSlash(cleanPath), "/")
+	return strings.HasPrefix(path, "assets/") ||
+		path == "logo.svg" ||
+		path == "logo.png" ||
+		path == "favicon.ico"
 }
 
 func shouldBypassEmbeddedFrontend(path string) bool {
