@@ -132,7 +132,8 @@ jobs:
           last_status=0
           for attempt in 1 2 3 4 5; do
             echo "Starting Aliyun deploy over SSH, attempt ${attempt}/5"
-            if ssh \
+            set +e
+            ssh \
               -o StrictHostKeyChecking=accept-new \
               -o ConnectTimeout=20 \
               -o ServerAliveInterval=30 \
@@ -142,14 +143,21 @@ jobs:
               -i ~/.ssh/aliyun_deploy \
               -p "$ALIYUN_PORT" \
               "$ALIYUN_USER@$ALIYUN_HOST" \
-              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' IMAGE_NAME='$IMAGE_NAME' IMAGE_TAG='$IMAGE_TAG' bash -se" < "$deploy_script"; then
+              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' IMAGE_NAME='$IMAGE_NAME' IMAGE_TAG='$IMAGE_TAG' bash -se" < "$deploy_script"
+            last_status="$?"
+            set -e
+
+            if [ "$last_status" -eq 0 ]; then
               exit 0
             fi
 
-            last_status="$?"
             sleep_seconds=$((attempt * 15))
-            echo "::warning::SSH deploy attempt ${attempt}/5 failed with exit code ${last_status}; retrying in ${sleep_seconds}s"
-            sleep "$sleep_seconds"
+            if [ "$attempt" -lt 5 ]; then
+              echo "::warning::SSH deploy attempt ${attempt}/5 failed with exit code ${last_status}; retrying in ${sleep_seconds}s"
+              sleep "$sleep_seconds"
+            else
+              echo "::error::SSH deploy failed after ${attempt} attempts with exit code ${last_status}"
+            fi
           done
 
           exit "$last_status"
