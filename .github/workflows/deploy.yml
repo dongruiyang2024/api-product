@@ -103,7 +103,8 @@ jobs:
           cat > docker-compose.local-build.yml <<YAML
           services:
             sub2api:
-              image: api-product/sub2api:main
+              image: sub2api-local:main
+              pull_policy: never
               build:
                 context: ./source
                 dockerfile: Dockerfile
@@ -113,8 +114,8 @@ jobs:
           YAML
 
           COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.local-build.yml"
-          docker compose $COMPOSE_FILES build sub2api
-          docker compose $COMPOSE_FILES up -d --remove-orphans
+          docker compose $COMPOSE_FILES build --progress=plain sub2api
+          docker compose $COMPOSE_FILES up -d --no-build --pull never --remove-orphans
           docker compose $COMPOSE_FILES ps
           docker image prune -f
           EOF
