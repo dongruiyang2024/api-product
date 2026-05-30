@@ -79,8 +79,8 @@ jobs:
           GIT_REF: ${{ github.ref_name }}
           REPO_URL: ${{ env.REPO_URL }}
         run: |
-          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/aliyun_deploy -p "$ALIYUN_PORT" "$ALIYUN_USER@$ALIYUN_HOST" \
-            "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' REPO_URL='$REPO_URL' GIT_REF='$GIT_REF' GIT_SHA='$GIT_SHA' bash -se" <<'EOF'
+          deploy_script="$RUNNER_TEMP/deploy-aliyun.sh"
+          cat > "$deploy_script" <<'EOF'
           set -euo pipefail
 
           command -v git >/dev/null
@@ -120,3 +120,28 @@ jobs:
           docker compose $COMPOSE_FILES ps
           docker image prune -f
           EOF
+
+          last_status=0
+          for attempt in 1 2 3 4 5; do
+            echo "Starting Aliyun deploy over SSH, attempt ${attempt}/5"
+            if ssh \
+              -o StrictHostKeyChecking=accept-new \
+              -o ConnectTimeout=20 \
+              -o ServerAliveInterval=30 \
+              -o ServerAliveCountMax=3 \
+              -o TCPKeepAlive=yes \
+              -o BatchMode=yes \
+              -i ~/.ssh/aliyun_deploy \
+              -p "$ALIYUN_PORT" \
+              "$ALIYUN_USER@$ALIYUN_HOST" \
+              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' REPO_URL='$REPO_URL' GIT_REF='$GIT_REF' GIT_SHA='$GIT_SHA' bash -se" < "$deploy_script"; then
+              exit 0
+            fi
+
+            last_status="$?"
+            sleep_seconds=$((attempt * 15))
+            echo "::warning::SSH deploy attempt ${attempt}/5 failed with exit code ${last_status}; retrying in ${sleep_seconds}s"
+            sleep "$sleep_seconds"
+          done
+
+          exit "$last_status"
