@@ -13,7 +13,7 @@ ARG POSTGRES_IMAGE=postgres:18-alpine
 ARG GOPROXY=https://goproxy.cn,direct
 ARG GOSUMDB=sum.golang.google.cn
 ARG NPM_REGISTRY=https://registry.npmmirror.com
-ARG ALPINE_MIRROR=https://mirrors.aliyun.com/alpine
+ARG ALPINE_MIRROR=mirrors.aliyun.com
 
 # -----------------------------------------------------------------------------
 # Stage 1: Frontend Builder
@@ -23,10 +23,14 @@ FROM ${NODE_IMAGE} AS frontend-builder
 ARG NPM_REGISTRY
 ARG ALPINE_MIRROR
 
+ENV COREPACK_NPM_REGISTRY=${NPM_REGISTRY}
+ENV NPM_CONFIG_REGISTRY=${NPM_REGISTRY}
+ENV npm_config_registry=${NPM_REGISTRY}
+
 WORKDIR /app/frontend
 
 # Install pnpm (pinned to v9 to match CI and keep builds reproducible)
-RUN sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
+RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
     corepack enable && \
     corepack prepare pnpm@9 --activate && \
     pnpm config set registry "${NPM_REGISTRY}"
@@ -56,7 +60,7 @@ ENV GOPROXY=${GOPROXY}
 ENV GOSUMDB=${GOSUMDB}
 
 # Install build dependencies
-RUN sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
+RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
     apk add --no-cache git ca-certificates tzdata
 
 WORKDIR /app/backend
@@ -101,7 +105,7 @@ LABEL description="Sub2API - AI API Gateway Platform"
 LABEL org.opencontainers.image.source="https://github.com/Wei-Shaw/sub2api"
 
 # Install runtime dependencies
-RUN sed -i "s|https://dl-cdn.alpinelinux.org/alpine|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
+RUN sed -i "s|dl-cdn.alpinelinux.org|${ALPINE_MIRROR}|g" /etc/apk/repositories && \
     apk add --no-cache \
     ca-certificates \
     tzdata \
