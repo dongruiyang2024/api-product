@@ -8,13 +8,15 @@ on:
 
 permissions:
   contents: read
+  packages: write
 
 concurrency:
   group: deploy-production
   cancel-in-progress: true
 
 env:
-  REPO_URL: https://github.com/dongruiyang2024/api-product.git
+  IMAGE_NAME: ghcr.io/dongruiyang2024/api-product
+  IMAGE_TAG: main
 
 jobs:
   deploy:
@@ -22,6 +24,33 @@ jobs:
     timeout-minutes: 45
 
     steps:
+      - name: Checkout
+        uses: actions/checkout@v6
+
+      - name: Set up Docker Buildx
+        uses: docker/setup-buildx-action@v3
+
+      - name: Log in to GHCR
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          file: ./Dockerfile
+          push: true
+          platforms: linux/amd64
+          build-args: |
+            VERSION=main
+            COMMIT=${{ github.sha }}
+          tags: |
+            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
+            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+
       - name: Prepare SSH
         env:
           ALIYUN_DEPLOY_BUNDLE: ${{ secrets.ALIYUN_DEPLOY_KEY }}
@@ -74,16 +103,11 @@ jobs:
             echo "::warning::ssh-keyscan timed out; SSH will use StrictHostKeyChecking=accept-new"
 
       - name: Deploy on Aliyun
-        env:
-          GIT_SHA: ${{ github.sha }}
-          GIT_REF: ${{ github.ref_name }}
-          REPO_URL: ${{ env.REPO_URL }}
         run: |
           deploy_script="$RUNNER_TEMP/deploy-aliyun.sh"
           cat > "$deploy_script" <<'EOF'
           set -euo pipefail
 
-          command -v git >/dev/null
           docker compose version >/dev/null
 
           mkdir -p "$DEPLOY_PATH"
@@ -91,32 +115,16 @@ jobs:
           test -f docker-compose.yml
           test -f docker-compose.prod.yml
 
-          if [ ! -d source/.git ]; then
-            rm -rf source
-            git clone --branch "$GIT_REF" "$REPO_URL" source
-          fi
-
-          cd source
-          git fetch origin "$GIT_REF"
-          git checkout --force "$GIT_SHA"
-          cd "$DEPLOY_PATH"
-
-          cat > docker-compose.local-build.yml <<YAML
+          cat > docker-compose.ghcr.yml <<YAML
           services:
             sub2api:
-              image: sub2api-local:main
-              pull_policy: never
-              build:
-                context: ./source
-                dockerfile: Dockerfile
-                args:
-                  VERSION: main
-                  COMMIT: ${GIT_SHA}
+              image: ${IMAGE_NAME}:${IMAGE_TAG}
+              pull_policy: always
           YAML
 
-          COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.local-build.yml"
-          docker compose $COMPOSE_FILES build --progress=plain sub2api
-          docker compose $COMPOSE_FILES up -d --no-build --pull never --remove-orphans
+          COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.ghcr.yml"
+          docker compose $COMPOSE_FILES pull sub2api
+          docker compose $COMPOSE_FILES up -d --remove-orphans
           docker compose $COMPOSE_FILES ps
           docker image prune -f
           EOF
@@ -134,7 +142,7 @@ jobs:
               -i ~/.ssh/aliyun_deploy \
               -p "$ALIYUN_PORT" \
               "$ALIYUN_USER@$ALIYUN_HOST" \
-              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' REPO_URL='$REPO_URL' GIT_REF='$GIT_REF' GIT_SHA='$GIT_SHA' bash -se" < "$deploy_script"; then
+              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' IMAGE_NAME='$IMAGE_NAME' IMAGE_TAG='$IMAGE_TAG' bash -se" < "$deploy_script"; then
               exit 0
             fi
 
