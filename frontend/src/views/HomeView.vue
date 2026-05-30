@@ -34,11 +34,20 @@
         <div class="flex items-center gap-2">
           <LocaleSwitcher />
           <router-link
-            :to="isAuthenticated ? dashboardPath : '/login'"
+            v-if="isAuthenticated"
+            :to="dashboardPath"
             class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-stone-800 transition-colors hover:border-stone-300 hover:text-stone-950"
           >
-            {{ isAuthenticated ? t('home.dashboard') : t('home.login') }}
+            {{ t('home.dashboard') }}
           </router-link>
+          <button
+            v-else
+            type="button"
+            class="rounded-lg border border-stone-200 bg-white px-3 py-2 text-sm font-semibold text-stone-800 transition-colors hover:border-stone-300 hover:text-stone-950"
+            @click="openLoginModal"
+          >
+            {{ t('home.login') }}
+          </button>
         </div>
       </nav>
     </header>
@@ -206,19 +215,61 @@
         </div>
       </div>
     </footer>
+
+    <Teleport to="body">
+      <div
+        v-if="showLoginModal"
+        class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/45 px-4 py-6 backdrop-blur-sm"
+        role="presentation"
+        @click.self="closeLoginModal"
+      >
+        <section
+          class="relative max-h-[calc(100vh-3rem)] w-full max-w-md overflow-y-auto rounded-lg border border-sky-100 bg-white p-6 shadow-2xl shadow-sky-950/20"
+          role="dialog"
+          aria-modal="true"
+          :aria-label="t('home.login')"
+        >
+          <button
+            type="button"
+            class="absolute right-4 top-4 inline-flex h-9 w-9 items-center justify-center rounded-lg text-slate-400 transition-colors hover:bg-slate-100 hover:text-slate-700"
+            :aria-label="t('common.close')"
+            @click="closeLoginModal"
+          >
+            <Icon name="x" size="md" />
+          </button>
+
+          <div class="mb-6 flex items-center gap-3 pr-10">
+            <span class="flex h-10 w-10 shrink-0 items-center justify-center overflow-hidden">
+              <img :src="siteLogo || '/logo.svg'" :alt="`${siteName} Logo`" class="h-full w-full object-contain" />
+            </span>
+            <div class="min-w-0">
+              <p class="truncate text-sm font-semibold text-slate-950">{{ siteName }}</p>
+              <p class="text-xs text-slate-500">{{ t('auth.signInToAccount') }}</p>
+            </div>
+          </div>
+
+          <LoginPanel redirect-to="/home" :autofocus="false" @success="handleLoginSuccess" />
+        </section>
+      </div>
+    </Teleport>
   </div>
 </template>
 
 <script setup lang="ts">
-import { computed, onMounted } from 'vue'
+import { computed, onBeforeUnmount, onMounted, ref, watch } from 'vue'
+import { useRouter } from 'vue-router'
 import { useI18n } from 'vue-i18n'
 import { useAuthStore, useAppStore } from '@/stores'
+import LoginPanel from '@/components/auth/LoginPanel.vue'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
+import Icon from '@/components/icons/Icon.vue'
 
 const { t } = useI18n()
 
+const router = useRouter()
 const authStore = useAuthStore()
 const appStore = useAppStore()
+const showLoginModal = ref(false)
 
 const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'oneAPI')
 const siteLogo = computed(() => appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || '')
@@ -235,6 +286,22 @@ const isAuthenticated = computed(() => authStore.isAuthenticated)
 const isAdmin = computed(() => authStore.isAdmin)
 const dashboardPath = computed(() => (isAdmin.value ? '/admin/dashboard' : '/dashboard'))
 const currentYear = computed(() => new Date().getFullYear())
+
+function openLoginModal(): void {
+  if (isAuthenticated.value) {
+    void router.push(dashboardPath.value)
+    return
+  }
+  showLoginModal.value = true
+}
+
+function closeLoginModal(): void {
+  showLoginModal.value = false
+}
+
+function handleLoginSuccess(): void {
+  closeLoginModal()
+}
 
 const heroMetrics = computed(() => [
   {
@@ -308,11 +375,24 @@ const trustItems = computed(() => [
   t('home.enterprise.trust.security'),
 ])
 
+watch(showLoginModal, (isOpen) => {
+  document.body.style.overflow = isOpen ? 'hidden' : ''
+})
+
+watch(isAuthenticated, (authenticated) => {
+  if (authenticated) {
+    closeLoginModal()
+  }
+})
 
 onMounted(() => {
   authStore.checkAuth()
   if (!appStore.publicSettingsLoaded) {
     appStore.fetchPublicSettings()
   }
+})
+
+onBeforeUnmount(() => {
+  document.body.style.overflow = ''
 })
 </script>

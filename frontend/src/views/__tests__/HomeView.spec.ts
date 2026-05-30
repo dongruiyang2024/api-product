@@ -3,9 +3,10 @@ import { mount } from '@vue/test-utils'
 
 import HomeView from '../HomeView.vue'
 
-const { checkAuth, fetchPublicSettings } = vi.hoisted(() => ({
+const { checkAuth, fetchPublicSettings, routerPush } = vi.hoisted(() => ({
   checkAuth: vi.fn(),
   fetchPublicSettings: vi.fn(),
+  routerPush: vi.fn(),
 }))
 
 const messages: Record<string, string> = {
@@ -14,6 +15,8 @@ const messages: Record<string, string> = {
   'home.switchToDark': '切换到深色模式',
   'home.dashboard': '控制台',
   'home.login': '登录',
+  'common.close': '关闭',
+  'auth.signInToAccount': '登录您的账户以继续',
   'home.enterprise.nav.models': '模型能力',
   'home.enterprise.nav.workflow': '开通流程',
   'home.enterprise.nav.pricing': '套餐价格',
@@ -108,11 +111,24 @@ vi.mock('@/stores', () => ({
   }),
 }))
 
+vi.mock('vue-router', async () => {
+  const actual = await vi.importActual<typeof import('vue-router')>('vue-router')
+  return {
+    ...actual,
+    useRouter: () => ({
+      push: routerPush,
+    }),
+  }
+})
+
 describe('HomeView enterprise landing page', () => {
   beforeEach(() => {
     checkAuth.mockReset()
     fetchPublicSettings.mockReset()
+    routerPush.mockReset()
     localStorage.clear()
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
     document.documentElement.classList.remove('dark')
     Object.defineProperty(window, 'matchMedia', {
       configurable: true,
@@ -122,6 +138,8 @@ describe('HomeView enterprise landing page', () => {
 
   afterEach(() => {
     vi.unstubAllGlobals()
+    document.body.innerHTML = ''
+    document.body.style.overflow = ''
   })
 
   it('renders a bright, plain-language enterprise homepage', () => {
@@ -129,6 +147,8 @@ describe('HomeView enterprise landing page', () => {
       global: {
         stubs: {
           RouterLink: { props: ['to'], template: '<a><slot /></a>' },
+          Teleport: { template: '<div><slot /></div>' },
+          LoginPanel: { template: '<div data-testid="login-panel"></div>' },
           LocaleSwitcher: true,
           Icon: true,
         },
@@ -191,5 +211,30 @@ describe('HomeView enterprise landing page', () => {
     expect(text).not.toContain('专人协助开通')
     expect(text).not.toContain('团队场景')
     expect(text).not.toContain('协助内容')
+  })
+
+  it('opens the login panel in a homepage modal', async () => {
+    const wrapper = mount(HomeView, {
+      global: {
+        stubs: {
+          RouterLink: { props: ['to'], template: '<a><slot /></a>' },
+          Teleport: { template: '<div><slot /></div>' },
+          LoginPanel: { template: '<div data-testid="login-panel"></div>' },
+          LocaleSwitcher: true,
+          Icon: true,
+        },
+      },
+    })
+
+    expect(wrapper.find('[data-testid="login-panel"]').exists()).toBe(false)
+
+    const loginButton = wrapper.findAll('button').find((button) => button.text() === '登录')
+    expect(loginButton).toBeTruthy()
+    await loginButton?.trigger('click')
+
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
+    expect(wrapper.find('[data-testid="login-panel"]').exists()).toBe(true)
+    expect(routerPush).not.toHaveBeenCalled()
+    wrapper.unmount()
   })
 })
