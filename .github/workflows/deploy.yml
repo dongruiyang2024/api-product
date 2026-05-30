@@ -70,7 +70,8 @@ jobs:
             echo "ALIYUN_DEPLOY_PATH=$ALIYUN_DEPLOY_PATH"
           } >> "$GITHUB_ENV"
 
-          ssh-keyscan -p "$ALIYUN_PORT" "$ALIYUN_HOST" >> ~/.ssh/known_hosts
+          ssh-keyscan -T 10 -p "$ALIYUN_PORT" "$ALIYUN_HOST" >> ~/.ssh/known_hosts || \
+            echo "::warning::ssh-keyscan timed out; SSH will use StrictHostKeyChecking=accept-new"
 
       - name: Deploy on Aliyun
         env:
@@ -78,7 +79,7 @@ jobs:
           GIT_REF: ${{ github.ref_name }}
           REPO_URL: ${{ env.REPO_URL }}
         run: |
-          ssh -i ~/.ssh/aliyun_deploy -p "$ALIYUN_PORT" "$ALIYUN_USER@$ALIYUN_HOST" \
+          ssh -o StrictHostKeyChecking=accept-new -i ~/.ssh/aliyun_deploy -p "$ALIYUN_PORT" "$ALIYUN_USER@$ALIYUN_HOST" \
             "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' REPO_URL='$REPO_URL' GIT_REF='$GIT_REF' GIT_SHA='$GIT_SHA' bash -se" <<'EOF'
           set -euo pipefail
 
