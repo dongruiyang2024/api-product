@@ -103,6 +103,9 @@ jobs:
             echo "::warning::ssh-keyscan timed out; SSH will use StrictHostKeyChecking=accept-new"
 
       - name: Deploy on Aliyun
+        env:
+          GHCR_USERNAME: ${{ github.actor }}
+          GHCR_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           deploy_script="$RUNNER_TEMP/deploy-aliyun.sh"
           cat > "$deploy_script" <<'EOF'
@@ -123,11 +126,22 @@ jobs:
           YAML
 
           COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.ghcr.yml"
+          printf '%s\n' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
           docker compose $COMPOSE_FILES pull sub2api
           docker compose $COMPOSE_FILES up -d --remove-orphans
           docker compose $COMPOSE_FILES ps
           docker image prune -f
           EOF
+
+          deploy_payload="$RUNNER_TEMP/deploy-aliyun-with-env.sh"
+          {
+            printf 'export DEPLOY_PATH=%q\n' "$ALIYUN_DEPLOY_PATH"
+            printf 'export IMAGE_NAME=%q\n' "$IMAGE_NAME"
+            printf 'export IMAGE_TAG=%q\n' "$IMAGE_TAG"
+            printf 'export GHCR_USERNAME=%q\n' "$GHCR_USERNAME"
+            printf 'export GHCR_TOKEN=%q\n' "$GHCR_TOKEN"
+            cat "$deploy_script"
+          } > "$deploy_payload"
 
           last_status=0
           for attempt in 1 2 3 4 5; do
@@ -143,7 +157,7 @@ jobs:
               -i ~/.ssh/aliyun_deploy \
               -p "$ALIYUN_PORT" \
               "$ALIYUN_USER@$ALIYUN_HOST" \
-              "DEPLOY_PATH='$ALIYUN_DEPLOY_PATH' IMAGE_NAME='$IMAGE_NAME' IMAGE_TAG='$IMAGE_TAG' bash -se" < "$deploy_script"
+              "bash -se" < "$deploy_payload"
             last_status="$?"
             set -e
 
