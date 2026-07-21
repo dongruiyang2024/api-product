@@ -5,6 +5,7 @@
 ## 文档索引
 
 - [项目代码总览](analysis/PROJECT_CODEBASE_OVERVIEW.md)
+- [Sub2API v0.1.162 差异化合并与上游同步计划](analysis/UPSTREAM_SYNC_V0.1.162_PLAN.md)
 - [Payment Guide](PAYMENT.md)
 - [支付配置指南](PAYMENT_CN.md)
 - [Admin Payment Integration API](ADMIN_PAYMENT_INTEGRATION_API.md)
