@@ -47,7 +47,7 @@
 - 前端全量测试通过：180 个测试文件、1238 项测试全部通过。
 - 使用与 Dockerfile 一致的临时 Go 1.26.5 工具链完成 `go test ./...`；带 `unit` 标签的 `internal/service`、`internal/repository`、`internal/web`、`internal/setup` 也全部通过。
 - 后端原生 arm64 二进制构建通过，产物约 134 MB；临时工具链、模块缓存和二进制均位于 `/private/tmp`，未进入仓库。
-- Docker Desktop daemon 已启动，但两次 amd64 镜像构建都在拉取 `docker/dockerfile:1.7` 的 OAuth token 时被 `auth.docker.io` EOF 中断，尚未进入项目构建步骤。
+- Docker Desktop daemon 已启动；多次重试后已拉取 `docker/dockerfile:1.7`，但基础镜像 token/manifest 请求仍被 Docker Hub EOF 中断，尚未进入项目构建步骤。
 - 工作流 YAML、其中 3 段 Shell、基础 Compose 配置、上游祖先关系、冲突标记和 `git diff --check` 静态校验通过。
 
 仍需在发布前完成：
