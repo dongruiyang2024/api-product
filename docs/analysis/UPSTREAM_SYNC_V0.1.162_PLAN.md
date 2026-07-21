@@ -2,7 +2,7 @@
 
 日期：2026-07-21
 
-状态：代码实施完成，发布前环境验证待进行
+状态：代码与本地工程验证完成，发布前业务环境验证待进行
 
 目标版本：Sub2API `v0.1.162`
 
@@ -36,23 +36,24 @@
 - 将后端默认品牌集中到 `internal/branding`，持久化新安装实例的站点名称和副标题，并让邮件、TOTP、支付主题等路径优先使用系统设置。
 - 将前端默认品牌集中到 `utils/branding.ts`，保留 oneAPI Logo、主题和企业首页。
 - `LoginView` 与首页弹窗统一复用 `LoginPanel`；账户开通联系方式改为读取公开 `contact_info`，源码不再包含个人联系方式。
-- 在新版 Dockerfile 上保留可选的 npm 与 Alpine 镜像参数；阿里云工作流改用不可变提交标签、版本化 Compose、显式安全配置检查和健康检查。
+- 在新版 Dockerfile 上保留可选的 npm 与 Alpine 镜像参数，并将 npm 参数同时传递给 Corepack 和 pnpm；阿里云工作流改用不可变提交标签、版本化 Compose、显式安全配置检查和健康检查。
+- CI 前端门禁改为完整执行 lint、typecheck、全量测试和生产构建；部署版本显式锁定同步基线 `0.1.162`，避免上游 `v0.1.162` 标签内遗留的 `VERSION=0.1.161` 造成镜像版本回退。
 - 修复上游回滚 API 新增 15 分钟超时后遗留测试契约未同步的问题。
 
 本地验证结果：
 
 - `git merge-base --is-ancestor v0.1.162 HEAD`、`git diff --check`、冲突标记和个人联系方式扫描通过。
-- 工作流 YAML、其中 3 段 Shell 和基础 Compose 配置静态校验通过。
+- 两个工作流 YAML、其中 13 段 `run` Shell 和基础 Compose 配置静态校验通过。
 - 前端 ESLint、TypeScript、生产构建通过。
-- 前端全量测试通过：180 个测试文件、1238 项测试全部通过。
+- 前端全量测试通过：180 个测试文件、1239 项测试全部通过。
 - 使用与 Dockerfile 一致的临时 Go 1.26.5 工具链完成 `go test ./...`；带 `unit` 标签的 `internal/service`、`internal/repository`、`internal/web`、`internal/setup` 也全部通过。
 - 后端原生 arm64 二进制构建通过，产物约 134 MB；临时工具链、模块缓存和二进制均位于 `/private/tmp`，未进入仓库。
-- Docker Desktop daemon 已启动；多次重试后已拉取 `docker/dockerfile:1.7`，但基础镜像 token/manifest 请求仍被 Docker Hub EOF 中断，尚未进入项目构建步骤。
-- 工作流 YAML、其中 3 段 Shell、基础 Compose 配置、上游祖先关系、冲突标记和 `git diff --check` 静态校验通过。
+- 使用 `golangci-lint v2.9.0` 执行仓库配置，结果为 `0 issues`。
+- Docker Hub 链路持续出现 EOF，因此使用 Google Artifact Registry 官方 Docker Hub 缓存经 TLS 拉取并导入基础镜像；随后使用可选 npm、Alpine 镜像参数完整构建 `linux/amd64` 镜像。产物 `api-product:sync-v0.1.162-validation` 的架构为 `linux/amd64`，运行版本为 `0.1.162-oneapi.local`。
+- 基础 Compose 配置、上游祖先关系、冲突标记和 `git diff --check` 静态校验通过。
 
 仍需在发布前完成：
 
-- 在网络可访问 Docker Hub 的 CI/预发布环境完成 amd64 镜像构建，并运行仓库配置的 `golangci-lint`。
 - 使用生产数据副本演练 50 个新增迁移、备份恢复和回滚。
 - 由发布负责人确认生产 `.env` 的 URL 安全默认值并执行预发布、灰度和观察。
 
@@ -430,6 +431,7 @@ Git 自动合并成功不代表业务正确。以下重叠区域必须逐文件�
 
 - 以新版 Dockerfile 为基础。
 - 保留 `NPM_CONFIG_REGISTRY` 可选参数。
+- 将 `NPM_CONFIG_REGISTRY` 同时传递给 Corepack 的 `COREPACK_NPM_REGISTRY` 和 pnpm，确保 pnpm 尚未安装时的引导下载也能使用可选镜像。
 - 如仍需要 Alpine 国内镜像，新增单一可选参数，不改变默认上游行为。
 - GitHub Actions 变量 `NPM_CONFIG_REGISTRY` 应填写完整 registry URL；`ALPINE_MIRROR` 应填写完整 Alpine 仓库基址，例如 `https://mirrors.aliyun.com/alpine`。变量留空时继续使用上游默认源。
 - 保留 BuildKit pnpm、Go module 和 Go build 缓存。
@@ -755,8 +757,8 @@ docker build --platform linux/amd64 \
 - [x] `vue-tsc` 类型检查已恢复并通过。
 - [x] 前端 lint、typecheck、测试和 build 通过。
 - [x] 后端全量测试和 build 通过。
-- [ ] 后端 `golangci-lint` 通过。
-- [ ] Docker amd64 镜像构建通过。
+- [x] 后端 `golangci-lint` 通过（`golangci-lint v2.9.0`，`0 issues`）。
+- [x] Docker amd64 镜像构建通过，镜像架构与运行版本已复核。
 - [ ] 生产数据副本完成全部迁移。
 - [ ] 数据库恢复演练通过。
 - [ ] 安全默认值已由发布负责人确认。
