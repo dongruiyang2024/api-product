@@ -1,13 +1,13 @@
 <template>
-  <div class="relative flex min-h-screen flex-col bg-[#f8fbff] text-slate-950 dark:bg-dark-950 dark:text-gray-100">
+  <div class="relative flex min-h-screen flex-col bg-gray-50 dark:bg-dark-950">
     <!-- Header (same pattern as HomeView) -->
     <header class="relative z-20 px-6 py-4">
       <nav class="mx-auto flex max-w-6xl items-center justify-between">
         <router-link to="/home" class="flex items-center gap-3">
-          <div class="h-10 w-10 overflow-hidden">
+          <div class="h-10 w-10 overflow-hidden rounded-xl shadow-md">
             <img :src="siteLogo || '/logo.svg'" alt="Logo" class="h-full w-full object-contain" />
           </div>
-          <span class="text-lg font-semibold tracking-tight text-slate-950 dark:text-white">{{ siteName }}</span>
+          <span class="text-lg font-semibold tracking-tight text-gray-900 dark:text-white">{{ siteName }}</span>
         </router-link>
         <div class="flex items-center gap-3">
           <LocaleSwitcher />
@@ -58,7 +58,7 @@
               v-model="apiKey"
               :type="keyVisible ? 'text' : 'password'"
               :placeholder="t('keyUsage.placeholder')"
-              class="input-ring h-12 w-full rounded-lg border border-sky-100 bg-white pl-12 pr-12 text-sm text-slate-950 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-dark-900 dark:text-white dark:placeholder:text-dark-500"
+              class="input-ring w-full h-12 pl-12 pr-12 rounded-xl border border-gray-200 bg-white text-sm text-gray-900 placeholder:text-gray-400 transition-all dark:border-dark-700 dark:bg-dark-900 dark:text-white dark:placeholder:text-dark-500"
               @keydown.enter="queryKey"
             />
             <button
@@ -77,7 +77,7 @@
           <button
             @click="queryKey"
             :disabled="isQuerying"
-            class="flex h-12 items-center gap-2 whitespace-nowrap rounded-lg bg-primary-600 px-7 text-sm font-medium text-white transition-all hover:bg-primary-700 active:scale-[0.97] disabled:opacity-60"
+            class="h-12 px-7 rounded-xl bg-primary-500 hover:bg-primary-600 text-white font-medium text-sm transition-all active:scale-[0.97] flex items-center gap-2 whitespace-nowrap disabled:opacity-60"
           >
             <svg v-if="isQuerying" class="w-4 h-4 animate-spin" viewBox="0 0 24 24" fill="none">
               <circle cx="12" cy="12" r="10" stroke="currentColor" stroke-width="3" opacity="0.25"/>
@@ -422,15 +422,18 @@ import { useI18n } from 'vue-i18n'
 import { useAppStore } from '@/stores'
 import LocaleSwitcher from '@/components/common/LocaleSwitcher.vue'
 import Icon from '@/components/icons/Icon.vue'
+import { buildGatewayUrl } from '@/api/client'
+import { formatDateLocalInput } from '@/utils/format'
+import { sanitizeUrl } from '@/utils/url'
 
 const { t, locale } = useI18n()
 const appStore = useAppStore()
 
 // ==================== Site Settings (same as HomeView) ====================
 
-const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'oneAPI')
-const siteLogo = computed(() => appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || '')
-const docUrl = computed(() => appStore.cachedPublicSettings?.doc_url || appStore.docUrl || '')
+const siteName = computed(() => appStore.cachedPublicSettings?.site_name || appStore.siteName || 'Sub2API')
+const siteLogo = computed(() => sanitizeUrl(appStore.cachedPublicSettings?.site_logo || appStore.siteLogo || '', { allowRelative: true, allowDataUrl: true }))
+const docUrl = computed(() => sanitizeUrl(appStore.cachedPublicSettings?.doc_url || appStore.docUrl || ''))
 const githubUrl = 'https://github.com/Wei-Shaw/sub2api'
 
 // ==================== Theme (same as HomeView) ====================
@@ -488,7 +491,6 @@ function setDateRange(key: DateRangeKey) {
 
 function getDateParams(): string {
   const now = new Date()
-  const fmt = (d: Date) => d.toISOString().split('T')[0]
   const params = new URLSearchParams()
 
   if (currentRange.value === 'custom') {
@@ -497,13 +499,13 @@ function getDateParams(): string {
       params.set('end_date', customEndDate.value)
     }
   } else {
-    const end = fmt(now)
+    const end = formatDateLocalInput(now)
     let start: string
     switch (currentRange.value) {
       case 'today': start = end; break
-      case '7d': start = fmt(new Date(now.getTime() - 7 * 86400000)); break
-      case '30d': start = fmt(new Date(now.getTime() - 30 * 86400000)); break
-      default: start = fmt(new Date(now.getTime() - 30 * 86400000))
+      case '7d': start = formatDateLocalInput(new Date(now.getTime() - 7 * 86400000)); break
+      case '30d': start = formatDateLocalInput(new Date(now.getTime() - 30 * 86400000)); break
+      default: start = formatDateLocalInput(new Date(now.getTime() - 30 * 86400000))
     }
     params.set('start_date', start)
     params.set('end_date', end)
@@ -525,7 +527,7 @@ function setDailyUsageDays(days: 7 | 30 | 90) {
 
 const CIRCUMFERENCE = 2 * Math.PI * 68
 const RING_GRADIENTS = [
-  { from: '#0284c7', to: '#7dd3fc' },
+  { from: '#14b8a6', to: '#5eead4' },
   { from: '#6366F1', to: '#A5B4FC' },
   { from: '#10B981', to: '#6EE7B7' },
   { from: '#F59E0B', to: '#FCD34D' },
@@ -856,7 +858,7 @@ function getBrowserTimezone(): string {
 
 async function fetchUsage(key: string) {
   const dateParams = getDateParams()
-  const url = '/v1/usage' + (dateParams ? '?' + dateParams : '')
+  const url = buildGatewayUrl('/v1/usage') + (dateParams ? '?' + dateParams : '')
   const res = await fetch(url, {
     headers: { 'Authorization': 'Bearer ' + key },
   })
@@ -943,8 +945,8 @@ onUnmounted(() => {
   transition: box-shadow 0.2s ease, border-color 0.2s ease;
 }
 .input-ring:focus {
-  box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-  border-color: #0284c7;
+  box-shadow: 0 0 0 3px rgba(20, 184, 166, 0.2);
+  border-color: #14b8a6;
   outline: none;
 }
 
