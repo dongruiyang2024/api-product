@@ -17,7 +17,9 @@ concurrency:
 env:
   IMAGE_NAME: ghcr.io/dongruiyang2024/api-product
   IMAGE_TAG: ${{ github.sha }}
-  UPSTREAM_VERSION: 0.1.162
+  # 与当前分支已合并的上游发布基线保持一致。
+  # 上游 v0.1.162 标签内的 VERSION 文件仍为 0.1.161，不能直接取用。
+  SYNC_BASE_VERSION: 0.1.162
 
 jobs:
   deploy:
@@ -33,9 +35,13 @@ jobs:
         shell: bash
         run: |
           set -euo pipefail
+          if [ -z "$SYNC_BASE_VERSION" ]; then
+            echo "::error::SYNC_BASE_VERSION is empty"
+            exit 1
+          fi
           short_sha="${GITHUB_SHA::12}"
-          echo "version=${UPSTREAM_VERSION}-oneapi.${short_sha}" >> "$GITHUB_OUTPUT"
-          echo "compose_file=docker-compose.${UPSTREAM_VERSION}.yml" >> "$GITHUB_OUTPUT"
+          echo "version=${SYNC_BASE_VERSION}-oneapi.${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "compose_file=docker-compose.${SYNC_BASE_VERSION}.yml" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
