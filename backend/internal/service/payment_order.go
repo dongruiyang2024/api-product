@@ -522,10 +522,14 @@ func selectedInstanceSupportedTypes(sel *payment.InstanceSelection) string {
 }
 
 func (s *PaymentService) buildPaymentSubject(plan *dbent.SubscriptionPlan, limitAmount float64, cfg *PaymentConfig, sel *payment.InstanceSelection) string {
+	siteName := defaultSiteName
+	if cfg != nil && cfg.siteName != "" {
+		siteName = cfg.siteName
+	}
 	if plan != nil {
 		productName := plan.ProductName
 		if productName == "" {
-			productName = "oneAPI Subscription " + plan.Name
+			productName = siteName + " Subscription " + plan.Name
 		}
 		return applyPaymentProductNameAffix(productName, cfg)
 	}
@@ -537,7 +541,7 @@ func (s *PaymentService) buildPaymentSubject(plan *dbent.SubscriptionPlan, limit
 	if hasPaymentProductNameAffix(cfg) {
 		return applyPaymentProductNameAffix(amountStr, cfg)
 	}
-	return "oneAPI " + amountStr + " " + currency
+	return siteName + " " + amountStr + " " + currency
 }
 
 func hasPaymentProductNameAffix(cfg *PaymentConfig) bool {

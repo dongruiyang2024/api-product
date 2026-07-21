@@ -21,8 +21,6 @@ const (
 	quotaDimDaily  = "daily"
 	quotaDimWeekly = "weekly"
 	quotaDimTotal  = "total"
-
-	defaultSiteName = "oneAPI"
 )
 
 // quotaDimLabels maps dimension names to display labels.

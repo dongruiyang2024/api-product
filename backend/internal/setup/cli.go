@@ -10,6 +10,7 @@ import (
 	"strconv"
 	"strings"
 
+	"github.com/Wei-Shaw/sub2api/internal/branding"
 	"golang.org/x/term"
 )
 
@@ -51,7 +52,7 @@ func RunCLI() error {
 
 	fmt.Println()
 	fmt.Println("╔═══════════════════════════════════════════╗")
-	fmt.Println("║       oneAPI Installation Wizard         ║")
+	fmt.Printf("║       %-6s Installation Wizard         ║\n", branding.DefaultSiteName)
 	fmt.Println("╚═══════════════════════════════════════════╝")
 	fmt.Println()
 

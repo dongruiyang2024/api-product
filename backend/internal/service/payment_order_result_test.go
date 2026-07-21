@@ -313,6 +313,19 @@ func TestBuildPaymentSubjectAppliesAffixToSubscriptionPlanDefaultName(t *testing
 	}
 }
 
+func TestBuildPaymentSubjectUsesConfiguredSiteName(t *testing.T) {
+	t.Parallel()
+
+	svc := &PaymentService{}
+	cfg := &PaymentConfig{siteName: "Configured Brand"}
+	plan := &dbent.SubscriptionPlan{Name: "Team Monthly"}
+
+	got := svc.buildPaymentSubject(plan, 0, cfg, nil)
+	if got != "Configured Brand Subscription Team Monthly" {
+		t.Fatalf("buildPaymentSubject() = %q, want %q", got, "Configured Brand Subscription Team Monthly")
+	}
+}
+
 func TestMaybeBuildWeChatOAuthRequiredResponse(t *testing.T) {
 	t.Setenv("PAYMENT_RESUME_SIGNING_KEY", "0123456789abcdef0123456789abcdef")
 
