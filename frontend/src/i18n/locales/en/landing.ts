@@ -109,6 +109,101 @@ export default {
       description: 'Sign up now and get free trial credits to experience seamless AI access',
       button: 'Sign Up Free'
     },
+    enterprise: {
+      nav: {
+        models: 'Model options',
+        workflow: 'Setup flow',
+        pricing: 'Pricing',
+        docs: 'Service docs',
+        keyUsage: 'Usage lookup'
+      },
+      badge: 'AI service for individuals, teams, and businesses',
+      headline: 'Let everyone freely enjoy AI services',
+      description: 'Put GPT, Claude, Gemini, and other top-tier models into one simple service, so individuals, teams, and businesses can start faster, see spending clearly, and get support when needed.',
+      primaryCta: 'Start service setup',
+      secondaryCta: 'View service details',
+      metrics: {
+        models: {
+          title: 'Top model aggregation',
+          desc: 'Access GPT, Claude, Gemini, and other leading models from one service entry point.'
+        },
+        reliability: {
+          title: 'Stable service experience',
+          desc: 'Ongoing availability, quota, and service status maintenance lowers the barrier to use.'
+        },
+        management: {
+          title: 'Transparent usage management',
+          desc: 'Spending, plans, orders, and usage records stay clear and traceable.'
+        }
+      },
+      serviceBrief: {
+        title: 'What this platform provides',
+        subtitle: 'For individuals, teams, and businesses, the platform combines model access, service assurance, and usage management into a sustainable AI model service.',
+        tag: 'Product capabilities',
+        sceneLabel: 'Model access',
+        sceneValue: 'Unified access to GPT, Claude, Gemini, and other leading models',
+        modelLabel: 'Use cases',
+        modelValue: 'Creation, engineering, support, automation, and AI product integration',
+        helpLabel: 'Service assurance',
+        helpValue: 'Availability maintenance, usage records, plan management, and integration support'
+      },
+      sectionLabel: {
+        platform: 'Platform value',
+        models: 'Model coverage',
+        workflow: 'Setup flow',
+        trust: 'Long-term service'
+      },
+      capabilities: {
+        title: 'Teams care about stability, clarity, and real support',
+        unified: {
+          title: 'One service entry point',
+          desc: 'Use common models from one place instead of managing several overseas platform accounts.'
+        },
+        governance: {
+          title: 'Clear spending and usage',
+          desc: 'Top-ups, plans, orders, and usage are visible in one place so team budgets are easier to manage.'
+        },
+        reliability: {
+          title: 'Stable availability',
+          desc: 'The platform maintains model service availability to reduce disruption to your business.'
+        },
+        support: {
+          title: 'Human support',
+          desc: 'Get ongoing help from setup through everyday usage questions.'
+        }
+      },
+      models: {
+        title: 'Coverage for common team AI scenarios',
+        description: 'Useful for AI products, customer support, content work, automation flows, and engineering productivity.',
+        ready: 'Available',
+        gptName: 'GPT models',
+        claudeName: 'Claude',
+        geminiName: 'Gemini',
+        devName: 'Developer assistance',
+        openai: 'Useful for Q&A, writing, summaries, and knowledge-base product scenarios.',
+        claude: 'Useful for long documents, complex collaboration, and high-quality content work.',
+        gemini: 'Useful for multimodal understanding, content generation, and broader business scenarios.',
+        codex: 'Useful for code understanding, documentation, and automation assistance for engineering teams.'
+      },
+      flow: {
+        title: 'Prepare for launch in four steps',
+        register: { title: 'Share your needs', desc: 'Tell us your team size, scenario, and preferred models.' },
+        plan: { title: 'Confirm plan and cost', desc: 'Choose the right plan or top-up approach with clear pricing upfront.' },
+        key: { title: 'Open team account', desc: 'Prepare the account, quota, and basic settings for your team.' },
+        call: { title: 'Connect and try', desc: 'Complete trial use and checks before moving into real business usage.' }
+      },
+      trust: {
+        title: 'A team service built for ongoing operations',
+        billing: 'Spending, plans, and orders are traceable',
+        status: 'Service status and usage are visible',
+        security: 'Member login and security settings are manageable'
+      },
+      finalCta: {
+        title: 'Bring AI model services into your business more reliably',
+        description: 'Designed for AI product teams, automation teams, and businesses that need reliable access to global model capabilities.'
+      }
+    },
+
     footer: {
       allRightsReserved: 'All rights reserved.'
     }

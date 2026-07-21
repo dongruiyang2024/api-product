@@ -176,8 +176,26 @@
       </div>
     </form>
 
-    <p v-if="showAccountContact && !backendModeEnabled" class="text-center text-sm leading-6 text-gray-500 dark:text-dark-400">
-      {{ t('auth.accountOpeningContact', { wechat: accountContactWechat }) }}
+    <p
+      v-if="shouldShowAccountContact"
+      data-testid="account-opening-contact"
+      class="text-center text-sm leading-6 text-gray-500 dark:text-dark-400"
+    >
+      {{ t('auth.accountOpeningContact', { contact: accountContact }) }}
+    </p>
+
+    <p
+      v-if="showRegistrationLink && !backendModeEnabled"
+      data-testid="registration-link"
+      class="text-center text-sm text-gray-500 dark:text-dark-400"
+    >
+      {{ t('auth.dontHaveAccount') }}
+      <router-link
+        to="/register"
+        class="font-medium text-primary-600 transition-colors hover:text-primary-500 dark:text-primary-400 dark:hover:text-primary-300"
+      >
+        {{ t('auth.signUp') }}
+      </router-link>
     </p>
   </div>
 
@@ -214,10 +232,12 @@ import { clearAllAffiliateReferralCodes } from '@/utils/oauthAffiliate'
 const props = withDefaults(defineProps<{
   redirectTo?: string
   showAccountContact?: boolean
+  showRegistrationLink?: boolean
   autofocus?: boolean
 }>(), {
   redirectTo: '',
   showAccountContact: true,
+  showRegistrationLink: false,
   autofocus: true
 })
 
@@ -227,7 +247,6 @@ const emit = defineEmits<{
 
 const { t } = useI18n()
 const LOGIN_AGREEMENT_STORAGE_KEY = 'sub2api_login_agreement_consent'
-const accountContactWechat = 'brysjhhrhl6'
 
 // ==================== Router & Stores ====================
 
@@ -254,6 +273,7 @@ const oidcOAuthProviderName = ref<string>('OIDC')
 const githubOAuthEnabled = ref<boolean>(false)
 const googleOAuthEnabled = ref<boolean>(false)
 const passwordResetEnabled = ref<boolean>(false)
+const accountContact = ref<string>('')
 const loginAgreementEnabled = ref<boolean>(false)
 const loginAgreementMode = ref<'modal' | 'checkbox' | string>('modal')
 const loginAgreementUpdatedAt = ref<string>('')
@@ -310,6 +330,10 @@ const showOAuthLogin = computed(
       googleOAuthEnabled.value)
 )
 
+const shouldShowAccountContact = computed(
+  () => props.showAccountContact && !backendModeEnabled.value && accountContact.value.length > 0,
+)
+
 watch(validationToastMessage, (value, previousValue) => {
   if (value && value !== previousValue) {
     appStore.showError(value)
@@ -339,8 +363,8 @@ onMounted(async () => {
     oidcOAuthProviderName.value = settings.oidc_oauth_provider_name || 'OIDC'
     githubOAuthEnabled.value = settings.github_oauth_enabled
     googleOAuthEnabled.value = settings.google_oauth_enabled
-    backendModeEnabled.value = settings.backend_mode_enabled
     passwordResetEnabled.value = settings.password_reset_enabled
+    accountContact.value = settings.contact_info?.trim() || ''
     applyLoginAgreementSettings(settings)
   } catch (error) {
     console.error('Failed to load public settings:', error)
@@ -410,7 +434,7 @@ function rejectLoginAgreement(): void {
   localStorage.removeItem(LOGIN_AGREEMENT_STORAGE_KEY)
   agreementAccepted.value = false
   showAgreementModal.value = false
-  appStore.showWarning('未同意最新条款前，无法输入账号密码或使用快捷登录。')
+  appStore.showWarning(t('legal.loginAgreementPrompt.loginRejectedWarning'))
 }
 
 // ==================== Turnstile Handlers ====================
@@ -441,7 +465,7 @@ function validateForm(): boolean {
   let isValid = true
 
   if (agreementGateActive.value) {
-    appStore.showWarning('请先阅读并同意最新条款后再登录。')
+    appStore.showWarning(t('legal.loginAgreementPrompt.loginRequiredWarning'))
     if (loginAgreementMode.value !== 'checkbox') {
       showAgreementModal.value = true
     }

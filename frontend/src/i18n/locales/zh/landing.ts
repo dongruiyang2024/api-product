@@ -109,6 +109,101 @@ export default {
       description: '注册即可获得免费试用额度，体验一站式 AI 服务',
       button: '免费注册'
     },
+    enterprise: {
+      nav: {
+        models: '模型能力',
+        workflow: '开通流程',
+        pricing: '套餐价格',
+        docs: '服务文档',
+        keyUsage: '用量查询'
+      },
+      badge: '面向每个人、团队和企业的 AI 服务',
+      headline: '让每个人都可以自由地享受 AI 服务',
+      description: '把 GPT、Claude、Gemini 等顶级模型统一放到一个简单服务里，无论个人、团队还是企业，都可以更快开通、更清楚地查看费用，并在使用过程中获得支持。',
+      primaryCta: '立即开通服务',
+      secondaryCta: '查看服务介绍',
+      metrics: {
+        models: {
+          title: '顶级模型聚合',
+          desc: '覆盖 GPT、Claude、Gemini 等能力，一个服务入口即可使用。'
+        },
+        reliability: {
+          title: '稳定服务体验',
+          desc: '持续维护可用性、额度与服务状态，降低使用门槛。'
+        },
+        management: {
+          title: '透明用量管理',
+          desc: '费用、套餐、订单和使用情况清晰可查。'
+        }
+      },
+      serviceBrief: {
+        title: '平台能提供什么',
+        subtitle: '面向个人、团队和企业，把模型能力、服务保障和使用管理整合为可持续使用的 AI 模型服务。',
+        tag: '产品能力',
+        sceneLabel: '模型能力',
+        sceneValue: 'GPT、Claude、Gemini 等顶级模型统一使用',
+        modelLabel: '使用场景',
+        modelValue: '创作、研发、客服、自动化和 AI 产品接入',
+        helpLabel: '服务保障',
+        helpValue: '稳定性维护、用量记录、套餐管理和接入支持'
+      },
+      sectionLabel: {
+        platform: '平台能力',
+        models: '模型覆盖',
+        workflow: '开通流程',
+        trust: '长期服务'
+      },
+      capabilities: {
+        title: '团队真正关心的是稳定、好管、有人支持',
+        unified: {
+          title: '统一服务入口',
+          desc: '不用分别处理多个海外平台账号，团队从一个入口使用常用模型。'
+        },
+        governance: {
+          title: '费用和用量清楚',
+          desc: '充值、套餐、订单和使用情况集中查看，团队预算更容易管理。'
+        },
+        reliability: {
+          title: '稳定可用',
+          desc: '平台持续维护模型服务可用性，减少业务中断带来的影响。'
+        },
+        support: {
+          title: '有人支持',
+          desc: '从开通到日常使用问题，都可以获得持续协助。'
+        }
+      },
+      models: {
+        title: '覆盖团队常用 AI 模型场景',
+        description: '适合 AI 产品、客服、内容生产、自动化流程和研发效率提升等场景。',
+        ready: '可用',
+        gptName: 'GPT 系列',
+        claudeName: 'Claude',
+        geminiName: 'Gemini',
+        devName: '开发辅助',
+        openai: '适合问答、写作、总结和知识库等常见产品场景。',
+        claude: '适合长文档理解、复杂任务协作和高质量内容处理。',
+        gemini: '适合多模态理解、内容生成和更丰富的业务场景。',
+        codex: '适合研发团队做代码理解、文档整理和自动化辅助。'
+      },
+      flow: {
+        title: '四步完成上线前准备',
+        register: { title: '提交需求', desc: '说明团队规模、使用场景和希望优先使用的模型。' },
+        plan: { title: '确认方案和费用', desc: '根据使用方式选择合适套餐或充值方式，费用提前说明。' },
+        key: { title: '开通团队账号', desc: '为团队准备账号、额度和基础设置。' },
+        call: { title: '接入并试用', desc: '完成试用和检查后，再逐步放到真实业务中使用。' }
+      },
+      trust: {
+        title: '适合长期运营的团队服务',
+        billing: '费用、套餐和订单可追踪',
+        status: '服务状态和使用情况可查看',
+        security: '成员登录和安全设置可管理'
+      },
+      finalCta: {
+        title: '让 AI 模型服务更稳定地进入你的业务',
+        description: '适合 AI 产品团队、自动化团队，以及需要稳定使用全球模型能力的企业客户。'
+      }
+    },
+
     footer: {
       allRightsReserved: '保留所有权利。'
     }

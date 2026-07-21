@@ -212,6 +212,7 @@ export default {
     continue: '继续',
     rememberMe: '记住我',
     dontHaveAccount: '还没有账户？',
+    accountOpeningContact: '如需开通账户，请联系：{contact}',
     alreadyHaveAccount: '已有账户？',
     registrationDisabled: '注册功能暂时关闭，请联系管理员。',
     emailLabel: '邮箱',

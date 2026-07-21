@@ -234,7 +234,12 @@ describe('HomeView enterprise landing page', () => {
 
     expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
     expect(wrapper.find('[data-testid="login-panel"]').exists()).toBe(true)
+    expect(document.body.style.overflow).toBe('hidden')
     expect(routerPush).not.toHaveBeenCalled()
+
+    await wrapper.find('[role="dialog"]').trigger('keydown', { key: 'Escape' })
+    expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
+    expect(document.body.style.overflow).toBe('')
     wrapper.unmount()
   })
 })
