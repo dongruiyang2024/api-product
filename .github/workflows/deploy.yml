@@ -16,7 +16,8 @@ concurrency:
 
 env:
   IMAGE_NAME: ghcr.io/dongruiyang2024/api-product
-  IMAGE_TAG: main
+  IMAGE_TAG: ${{ github.sha }}
+  UPSTREAM_VERSION: 0.1.162
 
 jobs:
   deploy:
@@ -26,6 +27,15 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v6
+
+      - name: Resolve image metadata
+        id: image
+        shell: bash
+        run: |
+          set -euo pipefail
+          short_sha="${GITHUB_SHA::12}"
+          echo "version=${UPSTREAM_VERSION}-oneapi.${short_sha}" >> "$GITHUB_OUTPUT"
+          echo "compose_file=docker-compose.${UPSTREAM_VERSION}.yml" >> "$GITHUB_OUTPUT"
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v3
@@ -45,11 +55,13 @@ jobs:
           push: true
           platforms: linux/amd64
           build-args: |
-            VERSION=main
+            VERSION=${{ steps.image.outputs.version }}
             COMMIT=${{ github.sha }}
+            NPM_CONFIG_REGISTRY=${{ vars.NPM_CONFIG_REGISTRY }}
+            ALPINE_MIRROR=${{ vars.ALPINE_MIRROR }}
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ env.IMAGE_TAG }}
             ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:${{ steps.image.outputs.version }}
 
       - name: Prepare SSH
         env:
@@ -115,8 +127,21 @@ jobs:
 
           mkdir -p "$DEPLOY_PATH"
           cd "$DEPLOY_PATH"
-          test -f docker-compose.yml
           test -f docker-compose.prod.yml
+          test -f .env
+
+          require_explicit_env() {
+            key="$1"
+            if ! grep -Eq "^${key}=(true|false)$" .env; then
+              echo "Missing explicit ${key}=true|false in $DEPLOY_PATH/.env" >&2
+              exit 1
+            fi
+          }
+
+          require_explicit_env SECURITY_URL_ALLOWLIST_ALLOW_INSECURE_HTTP
+          require_explicit_env SECURITY_URL_ALLOWLIST_ALLOW_PRIVATE_HOSTS
+
+          printf '%s' "$BASE_COMPOSE_B64" | base64 -d > "$BASE_COMPOSE_FILE"
 
           cat > docker-compose.ghcr.yml <<YAML
           services:
@@ -125,19 +150,45 @@ jobs:
               pull_policy: always
           YAML
 
-          COMPOSE_FILES="-f docker-compose.yml -f docker-compose.prod.yml -f docker-compose.ghcr.yml"
+          COMPOSE_FILES="-f ${BASE_COMPOSE_FILE} -f docker-compose.prod.yml -f docker-compose.ghcr.yml"
           printf '%s\n' "$GHCR_TOKEN" | docker login ghcr.io -u "$GHCR_USERNAME" --password-stdin
+          docker compose $COMPOSE_FILES config --quiet
           docker compose $COMPOSE_FILES pull sub2api
           docker compose $COMPOSE_FILES up -d --remove-orphans
           docker compose $COMPOSE_FILES ps
-          docker image prune -f
+
+          container_id="$(docker compose $COMPOSE_FILES ps -q sub2api)"
+          if [ -z "$container_id" ]; then
+            echo "sub2api container was not created" >&2
+            exit 1
+          fi
+
+          for health_attempt in $(seq 1 30); do
+            health_status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id")"
+            if [ "$health_status" = "healthy" ]; then
+              break
+            fi
+            if [ "$health_status" = "unhealthy" ] || [ "$health_status" = "exited" ]; then
+              docker compose $COMPOSE_FILES logs --tail=200 sub2api
+              exit 1
+            fi
+            if [ "$health_attempt" -eq 30 ]; then
+              docker compose $COMPOSE_FILES logs --tail=200 sub2api
+              echo "sub2api did not become healthy in time" >&2
+              exit 1
+            fi
+            sleep 5
+          done
           EOF
 
           deploy_payload="$RUNNER_TEMP/deploy-aliyun-with-env.sh"
+          BASE_COMPOSE_B64="$(base64 < deploy/docker-compose.yml | tr -d '\n')"
           {
             printf 'export DEPLOY_PATH=%q\n' "$ALIYUN_DEPLOY_PATH"
             printf 'export IMAGE_NAME=%q\n' "$IMAGE_NAME"
             printf 'export IMAGE_TAG=%q\n' "$IMAGE_TAG"
+            printf 'export BASE_COMPOSE_FILE=%q\n' "${{ steps.image.outputs.compose_file }}"
+            printf 'export BASE_COMPOSE_B64=%q\n' "$BASE_COMPOSE_B64"
             printf 'export GHCR_USERNAME=%q\n' "$GHCR_USERNAME"
             printf 'export GHCR_TOKEN=%q\n' "$GHCR_TOKEN"
             cat "$deploy_script"

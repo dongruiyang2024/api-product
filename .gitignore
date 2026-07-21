@@ -130,6 +130,7 @@ AGENTS.md
 backend/cmd/server/server
 deploy/docker-compose.override.yml
 .gocache/
+.pnpm-store/
 vite.config.js
 docs/*
 !docs/README.md
