@@ -44,12 +44,15 @@
 - `git merge-base --is-ancestor v0.1.162 HEAD`、`git diff --check`、冲突标记和个人联系方式扫描通过。
 - 工作流 YAML、其中 3 段 Shell 和基础 Compose 配置静态校验通过。
 - 前端 ESLint、TypeScript、生产构建通过。
-- 前端全量测试通过：180 个测试文件、1239 项测试全部通过。
-- Go 后端测试和 Docker amd64 镜像构建尚未在本机执行：主机没有 Go，Docker Desktop 安装缺少可执行入口，终端网络也无法解析 `go.dev` 以下载临时工具链。该限制属于验证环境，不代表测试已通过。
+- 前端全量测试通过：180 个测试文件、1238 项测试全部通过。
+- 使用与 Dockerfile 一致的临时 Go 1.26.5 工具链完成 `go test ./...`；带 `unit` 标签的 `internal/service`、`internal/repository`、`internal/web`、`internal/setup` 也全部通过。
+- 后端原生 arm64 二进制构建通过，产物约 134 MB；临时工具链、模块缓存和二进制均位于 `/private/tmp`，未进入仓库。
+- Docker Desktop daemon 已启动，但两次 amd64 镜像构建都在拉取 `docker/dockerfile:1.7` 的 OAuth token 时被 `auth.docker.io` EOF 中断，尚未进入项目构建步骤。
+- 工作流 YAML、其中 3 段 Shell、基础 Compose 配置、上游祖先关系、冲突标记和 `git diff --check` 静态校验通过。
 
 仍需在发布前完成：
 
-- 在具备 Go 1.26.5 或可用 Docker daemon 的 CI/预发布环境运行后端全量测试、静态检查和镜像构建。
+- 在网络可访问 Docker Hub 的 CI/预发布环境完成 amd64 镜像构建，并运行仓库配置的 `golangci-lint`。
 - 使用生产数据副本演练 50 个新增迁移、备份恢复和回滚。
 - 由发布负责人确认生产 `.env` 的 URL 安全默认值并执行预发布、灰度和观察。
 
@@ -148,7 +151,7 @@
 | --- | --- | --- | --- |
 | oneAPI 产品首页 | `frontend/src/views/HomeView.vue` | 基于新版首页和安全工具重新移植 | 首页内容、响应式、文档链接、登录入口 |
 | 首页登录弹窗 | `frontend/src/components/auth/LoginPanel.vue` | 抽取新版共享登录表单，首页弹窗和登录页复用 | 密码、OAuth、Turnstile、登录协议、TOTP、重定向 |
-| 账户开通联系方式 | `LoginPanel.vue` 中硬编码微信号 | 新增公开站点设置或明确的部署配置 | 管理端可配置、前端无硬编码、空值时不显示 |
+| 账户开通联系方式 | `LoginPanel.vue` 中硬编码微信号 | 复用新版公开站点设置 `contact_info` | 管理端可配置、前端无硬编码、空值时不显示 |
 | oneAPI Logo | `frontend/public/logo.svg` | 保留视觉资产，适配新版 Logo/Favicon 注入和 URL 清洗 | 首屏、浏览器标签、深浅色背景、缓存刷新 |
 | oneAPI 主色与圆角 | `style.css`、`tailwind.config.js` | 收敛为品牌 token 或独立样式层 | 不覆盖上游新版暗色修复和组件可访问性 |
 | 阿里云自动部署 | `.github/workflows/deploy.yml` | 保留并升级为版本化镜像与配置发布 | GHCR、SSH 重试、Compose 配置同步、健康检查 |
@@ -185,7 +188,14 @@
 - `doc_url`
 - `home_content`
 
-账户开通联系方式目前没有对应设置。建议新增结构化公开配置，而不是继续使用 `accountContactWechat` 常量。建议字段至少支持：
+目标版本已包含持久化设置 `contact_info`，并通过公开设置接口返回。此次直接复用该字段，不新增数据库迁移：
+
+- 管理员在站点设置中维护联系方式。
+- `LoginPanel` 只读取公开设置，去除首尾空白后展示。
+- 空值、后端模式或组件显式关闭展示时不渲染入口。
+- 源码不再保存个人微信号。
+
+如果后续需要多渠道联系卡片，可再把单一文本升级为以下结构化字段：
 
 ```text
 account_contact_enabled
@@ -744,7 +754,8 @@ docker build --platform linux/amd64 \
 - [x] 旧的单文件语言包未被恢复。
 - [x] `vue-tsc` 类型检查已恢复并通过。
 - [x] 前端 lint、typecheck、测试和 build 通过。
-- [ ] 后端测试、lint、build 通过。
+- [x] 后端全量测试和 build 通过。
+- [ ] 后端 `golangci-lint` 通过。
 - [ ] Docker amd64 镜像构建通过。
 - [ ] 生产数据副本完成全部迁移。
 - [ ] 数据库恢复演练通过。
