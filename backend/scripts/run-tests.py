@@ -42,7 +42,7 @@ def run_suite(tags=None, *, service_only=False):
             [binary, "-test.list=.", f"-test.timeout={TEST_TIMEOUT}"],
             capture=True, cwd=SERVICE_DIR, timeout=PROCESS_TIMEOUT_SECONDS,
         )
-        tests = [line for line in listing.splitlines() if re.fullmatch(r"(?:Test|Example|Fuzz)\w+", line)]
+        tests = [line for line in listing.splitlines() if re.fullmatch(r"(?:Test|Example|Fuzz)\w*", line)]
         if not tests or len(tests) != len(set(tests)):
             raise RuntimeError("Service test enumeration is empty or contains duplicate names")
         total = (len(tests) + SERVICE_BATCH_SIZE - 1) // SERVICE_BATCH_SIZE

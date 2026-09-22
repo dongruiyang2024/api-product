@@ -13,7 +13,7 @@ spec.loader.exec_module(runner)
 
 class TestServiceShards(unittest.TestCase):
     def test_all_tests_and_fuzz_seeds_run_exactly_once_with_tags_and_timeout(self):
-        names = [f"TestCase{i}" for i in range(81)] + ["ExampleGateway", "FuzzRoute"]
+        names = [f"TestCase{i}" for i in range(81)] + ["ExampleGateway", "FuzzRoute", "Example", "Test", "Fuzz"]
         commands = []
 
         def fake(command, *, capture=False, **kwargs):
