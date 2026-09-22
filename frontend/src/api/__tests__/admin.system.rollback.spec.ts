@@ -14,8 +14,6 @@ vi.mock('../client', () => ({
 
 import { getRollbackVersions, rollback, type RollbackVersionInfo } from '@/api/admin/system'
 
-const updateRequestConfig = { timeout: 15 * 60 * 1000 }
-
 describe('admin system rollback API', () => {
   beforeEach(() => {
     get.mockReset()
@@ -46,7 +44,7 @@ describe('admin system rollback API', () => {
     expect(post).toHaveBeenCalledWith(
       '/admin/system/rollback',
       { version: '0.1.146' },
-      updateRequestConfig,
+      { timeout: 15 * 60 * 1000 }
     )
     expect(result.need_restart).toBe(true)
   })
@@ -56,6 +54,10 @@ describe('admin system rollback API', () => {
 
     await rollback()
 
-    expect(post).toHaveBeenCalledWith('/admin/system/rollback', undefined, updateRequestConfig)
+    expect(post).toHaveBeenCalledWith(
+      '/admin/system/rollback',
+      undefined,
+      { timeout: 15 * 60 * 1000 }
+    )
   })
 })

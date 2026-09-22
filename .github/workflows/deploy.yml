@@ -1,13 +1,15 @@
 name: Deploy to Aliyun
 
 on:
-  push:
-    branches:
-      - main
+  workflow_run:
+    workflows: [CI]
+    types: [completed]
+    branches: [main]
   workflow_dispatch:
 
 permissions:
   contents: read
+  actions: read
   packages: write
 
 concurrency:
@@ -16,19 +18,42 @@ concurrency:
 
 env:
   IMAGE_NAME: ghcr.io/dongruiyang2024/api-product
-  IMAGE_TAG: ${{ github.sha }}
   # 与当前分支已合并的上游发布基线保持一致。
-  # 上游 v0.1.162 标签内的 VERSION 文件仍为 0.1.161，不能直接取用。
-  SYNC_BASE_VERSION: 0.1.162
+  # 上游 v0.2.7 标签内的 VERSION 文件仍为 0.2.5，不能直接取用。
+  SYNC_BASE_VERSION: 0.2.7
 
 jobs:
   deploy:
+    if: github.event_name == 'workflow_dispatch' || (github.event.workflow_run.conclusion == 'success' && github.event.workflow_run.event == 'push' && github.event.workflow_run.head_repository.full_name == github.repository)
     runs-on: ubuntu-latest
     timeout-minutes: 45
 
     steps:
-      - name: Checkout
+      - name: Require successful CI for the current main commit
+        id: candidate
+        uses: actions/github-script@v8
+        with:
+          script: |
+            const sha = context.payload.workflow_run?.head_sha ?? context.sha;
+            const { data: main } = await github.rest.repos.getBranch({ ...context.repo, branch: 'main' });
+            if (sha !== main.commit.sha) {
+              throw new Error('Deployment candidate is no longer the current main commit');
+            }
+            const { data } = await github.rest.actions.listWorkflowRuns({
+              ...context.repo, workflow_id: 'backend-ci.yml', head_sha: sha,
+              branch: 'main', event: 'push', per_page: 100,
+            });
+            const latest = data.workflow_runs.sort((a, b) => b.id - a.id)[0];
+            if (!latest || latest.status !== 'completed' || latest.conclusion !== 'success') {
+              throw new Error(`Commit ${sha} must pass the complete CI workflow before deployment`);
+            }
+            core.setOutput('sha', sha);
+            core.exportVariable('IMAGE_TAG', sha);
+
+      - name: Checkout verified commit
         uses: actions/checkout@v6
+        with:
+          ref: ${{ steps.candidate.outputs.sha }}
 
       - name: Resolve image metadata
         id: image
@@ -39,7 +64,7 @@ jobs:
             echo "::error::SYNC_BASE_VERSION is empty"
             exit 1
           fi
-          short_sha="${GITHUB_SHA::12}"
+          short_sha="${IMAGE_TAG::12}"
           echo "version=${SYNC_BASE_VERSION}-oneapi.${short_sha}" >> "$GITHUB_OUTPUT"
           echo "compose_file=docker-compose.${SYNC_BASE_VERSION}.yml" >> "$GITHUB_OUTPUT"
 
@@ -62,12 +87,23 @@ jobs:
           platforms: linux/amd64
           build-args: |
             VERSION=${{ steps.image.outputs.version }}
-            COMMIT=${{ github.sha }}
+            COMMIT=${{ steps.candidate.outputs.sha }}
             NPM_CONFIG_REGISTRY=${{ vars.NPM_CONFIG_REGISTRY }}
             ALPINE_MIRROR=${{ vars.ALPINE_MIRROR }}
           tags: |
-            ${{ env.IMAGE_NAME }}:${{ github.sha }}
+            ${{ env.IMAGE_NAME }}:${{ steps.candidate.outputs.sha }}
             ${{ env.IMAGE_NAME }}:${{ steps.image.outputs.version }}
+
+      - name: Reject superseded deployment before accessing production
+        uses: actions/github-script@v8
+        env:
+          CANDIDATE_SHA: ${{ steps.candidate.outputs.sha }}
+        with:
+          script: |
+            const { data } = await github.rest.repos.getBranch({ ...context.repo, branch: 'main' });
+            if (data.commit.sha !== process.env.CANDIDATE_SHA) {
+              throw new Error('main advanced during the image build; deploy its successful CI run instead');
+            }
 
       - name: Prepare SSH
         env:
@@ -129,6 +165,8 @@ jobs:
           cat > "$deploy_script" <<'EOF'
           set -euo pipefail
 
+          # 保留 255 给 SSH 传输故障，避免远端命令同码触发整体重试。
+          trap 'status=$?; if [ "$status" -eq 255 ]; then exit 1; fi' EXIT
           docker compose version >/dev/null
 
           mkdir -p "$DEPLOY_PATH"
@@ -154,6 +192,9 @@ jobs:
             sub2api:
               image: ${IMAGE_NAME}:${IMAGE_TAG}
               pull_policy: always
+              # 普通 InitEnt 的初始化预算为 600 秒；最后一层防止生产覆盖文件缩短宽限。
+              healthcheck:
+                start_period: 600s
           YAML
 
           COMPOSE_FILES="-f ${BASE_COMPOSE_FILE} -f docker-compose.prod.yml -f docker-compose.ghcr.yml"
@@ -171,23 +212,11 @@ jobs:
             exit 1
           fi
 
-          # v0.1.162 首次启动需要执行 50 个前向迁移，最多等待 10 分钟。
-          for health_attempt in $(seq 1 120); do
-            health_status="$(docker inspect --format '{{if .State.Health}}{{.State.Health.Status}}{{else}}{{.State.Status}}{{end}}' "$container_id")"
-            if [ "$health_status" = "healthy" ]; then
-              break
-            fi
-            if [ "$health_status" = "unhealthy" ] || [ "$health_status" = "exited" ]; then
-              docker compose $COMPOSE_FILES logs --tail=200 sub2api
-              exit 1
-            fi
-            if [ "$health_attempt" -eq 120 ]; then
-              docker compose $COMPOSE_FILES logs --tail=200 sub2api
-              echo "sub2api did not become healthy in time" >&2
-              exit 1
-            fi
-            sleep 5
-          done
+          wait_for_container "$container_id" || {
+            status=$?
+            docker compose $COMPOSE_FILES logs --tail=200 sub2api
+            exit "$status"
+          }
           EOF
 
           deploy_payload="$RUNNER_TEMP/deploy-aliyun-with-env.sh"
@@ -200,38 +229,17 @@ jobs:
             printf 'export BASE_COMPOSE_B64=%q\n' "$BASE_COMPOSE_B64"
             printf 'export GHCR_USERNAME=%q\n' "$GHCR_USERNAME"
             printf 'export GHCR_TOKEN=%q\n' "$GHCR_TOKEN"
+            cat deploy/wait-for-container.sh
             cat "$deploy_script"
           } > "$deploy_payload"
 
-          last_status=0
-          for attempt in 1 2 3 4 5; do
-            echo "Starting Aliyun deploy over SSH, attempt ${attempt}/5"
-            set +e
-            ssh \
-              -o StrictHostKeyChecking=accept-new \
-              -o ConnectTimeout=20 \
-              -o ServerAliveInterval=30 \
-              -o ServerAliveCountMax=3 \
-              -o TCPKeepAlive=yes \
-              -o BatchMode=yes \
-              -i ~/.ssh/aliyun_deploy \
-              -p "$ALIYUN_PORT" \
-              "$ALIYUN_USER@$ALIYUN_HOST" \
-              "bash -se" < "$deploy_payload"
-            last_status="$?"
-            set -e
-
-            if [ "$last_status" -eq 0 ]; then
-              exit 0
-            fi
-
-            sleep_seconds=$((attempt * 15))
-            if [ "$attempt" -lt 5 ]; then
-              echo "::warning::SSH deploy attempt ${attempt}/5 failed with exit code ${last_status}; retrying in ${sleep_seconds}s"
-              sleep "$sleep_seconds"
-            else
-              echo "::error::SSH deploy failed after ${attempt} attempts with exit code ${last_status}"
-            fi
-          done
-
-          exit "$last_status"
+          bash deploy/ssh-retry.sh "$deploy_payload" ssh \
+            -o StrictHostKeyChecking=accept-new \
+            -o ConnectTimeout=20 \
+            -o ServerAliveInterval=30 \
+            -o ServerAliveCountMax=3 \
+            -o TCPKeepAlive=yes \
+            -o BatchMode=yes \
+            -i ~/.ssh/aliyun_deploy \
+            -p "$ALIYUN_PORT" \
+            "$ALIYUN_USER@$ALIYUN_HOST" "bash -se"

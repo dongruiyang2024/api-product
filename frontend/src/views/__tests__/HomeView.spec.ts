@@ -1,12 +1,13 @@
 import { describe, expect, it, beforeEach, afterEach, vi } from 'vitest'
-import { mount } from '@vue/test-utils'
+import { flushPromises, mount } from '@vue/test-utils'
 
 import HomeView from '../HomeView.vue'
 
-const { checkAuth, fetchPublicSettings, routerPush } = vi.hoisted(() => ({
+const { checkAuth, fetchPublicSettings, routerPush, settings } = vi.hoisted(() => ({
   checkAuth: vi.fn(),
   fetchPublicSettings: vi.fn(),
   routerPush: vi.fn(),
+  settings: { value: {} as Record<string, unknown> },
 }))
 
 const messages: Record<string, string> = {
@@ -102,7 +103,7 @@ vi.mock('@/stores', () => ({
     user: null,
   }),
   useAppStore: () => ({
-    cachedPublicSettings: null,
+    cachedPublicSettings: settings.value,
     siteName: 'oneAPI',
     siteLogo: '',
     docUrl: 'https://docs.example.com',
@@ -123,6 +124,7 @@ vi.mock('vue-router', async () => {
 
 describe('HomeView enterprise landing page', () => {
   beforeEach(() => {
+    settings.value = {}
     checkAuth.mockReset()
     fetchPublicSettings.mockReset()
     routerPush.mockReset()
@@ -215,6 +217,7 @@ describe('HomeView enterprise landing page', () => {
 
   it('opens the login panel in a homepage modal', async () => {
     const wrapper = mount(HomeView, {
+      attachTo: document.body,
       global: {
         stubs: {
           RouterLink: { props: ['to'], template: '<a><slot /></a>' },
@@ -230,6 +233,7 @@ describe('HomeView enterprise landing page', () => {
 
     const loginButton = wrapper.findAll('button').find((button) => button.text() === '登录')
     expect(loginButton).toBeTruthy()
+    ;(loginButton!.element as HTMLButtonElement).focus()
     await loginButton?.trigger('click')
 
     expect(wrapper.find('[role="dialog"]').exists()).toBe(true)
@@ -240,6 +244,29 @@ describe('HomeView enterprise landing page', () => {
     await wrapper.find('[role="dialog"]').trigger('keydown', { key: 'Escape' })
     expect(wrapper.find('[role="dialog"]').exists()).toBe(false)
     expect(document.body.style.overflow).toBe('')
+    await flushPromises()
+    expect(document.activeElement).toBe(loginButton!.element)
     wrapper.unmount()
   })
+  it('按公开配置显示精简首页并保留 oneAPI 品牌', () => {
+    settings.value = { compact_home_enabled: true, site_subtitle: 'Configured subtitle' }
+    const wrapper = mount(HomeView, { global: { stubs: { RouterLink: true, LocaleSwitcher: true, Icon: true } } })
+    expect(wrapper.get('[data-testid="compact-home"]').text()).toContain('oneAPI')
+    expect(wrapper.text()).toContain('Configured subtitle')
+    expect(wrapper.find('[data-testid="home-headline"]').exists()).toBe(false)
+  })
+
+  it.each([false, true])('模型广场要求认证为 %s 时匹配访客入口可见性', (requireAuth) => {
+    settings.value = { model_plaza_enabled: true, model_plaza_require_auth: requireAuth }
+    const wrapper = mount(HomeView, { global: { stubs: { RouterLink: true, LocaleSwitcher: true, Icon: true } } })
+    expect(wrapper.find('router-link-stub[to="/model-plaza"]').exists()).toBe(!requireAuth)
+    const mobileEntry = wrapper.find('[data-testid="mobile-model-plaza"]')
+    expect(mobileEntry.exists()).toBe(!requireAuth)
+    if (!requireAuth) {
+      expect(mobileEntry.classes()).toContain('md:hidden')
+      expect(mobileEntry.attributes('aria-label')).toBe('nav.modelPlaza')
+      expect(mobileEntry.element.parentElement?.classList.contains('hidden')).toBe(false)
+    }
+  })
+
 })

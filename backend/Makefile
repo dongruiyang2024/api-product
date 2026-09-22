@@ -11,11 +11,11 @@ generate:
 	go generate ./cmd/server
 
 test:
-	go test ./...
+	python3 scripts/run-tests.py
 	golangci-lint run ./...
 
 test-unit:
-	go test -tags=unit ./...
+	python3 scripts/run-tests.py --tags=unit
 
 test-integration:
 	go test -tags=integration ./...
